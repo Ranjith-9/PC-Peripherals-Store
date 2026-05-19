@@ -6,7 +6,9 @@ export async function GET(req: NextRequest) {
 
   const category = req.nextUrl.searchParams.getAll("category") || undefined;
 
-  const products = await getProducts(cursor, category);
+  const sort = req.nextUrl.searchParams.get("sort") || "latest";
+
+  const products = await getProducts(cursor, category, sort);
 
   return NextResponse.json({ products, hasMore: products.length === 10 });
 }

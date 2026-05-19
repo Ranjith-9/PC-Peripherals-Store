@@ -1,14 +1,9 @@
 "use client";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import type { Filtertype } from "@/types/filter";
 
-export default function SideBar({
-  categories,
-  selectedCategory,
-  setSelectedCategory,
-  filters,
-  setFilters,
-}: any) {
+export default function SideBar({ categories, filters, setFilters }: any) {
   const options = [
     {
       title: "Categories",
@@ -31,9 +26,9 @@ export default function SideBar({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
-                  setSelectedCategory((prev: any) => ({
+                  setFilters((prev: Filtertype) => ({
                     ...prev,
-                    [section.title]: [],
+                    category: [],
                   }));
                 }}
                 className="text-sm text-gray-500 hover:text-black"
@@ -66,20 +61,18 @@ export default function SideBar({
               <label key={option} className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={
-                    selectedCategory[section.title]?.includes(option) || false
-                  }
+                  checked={filters.category.includes(option)}
                   onChange={() => {
-                    setSelectedCategory((prev: any) => {
-                      const current = prev[section.title] || [];
+                    setFilters((prev: Filtertype) => {
+                      const current = prev.category;
 
                       const updated = current.includes(option)
-                        ? current.filter((item: any) => item !== option)
+                        ? current.filter((item) => item !== option)
                         : [...current, option];
 
                       return {
                         ...prev,
-                        [section.title]: updated,
+                        category: updated,
                       };
                     });
                   }}

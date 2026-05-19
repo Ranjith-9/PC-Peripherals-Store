@@ -2,28 +2,29 @@
 import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
 
-export default function ProductGrid({
-  addToCart,
-  productData,
-  selectedCategory,
-}: any) {
+export default function ProductGrid({ addToCart, productData, filters }: any) {
   const [product, setProduct] = useState(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     fetchProductsByCategory();
-  }, [selectedCategory]);
+  }, [filters]);
 
   async function fetchProductsByCategory() {
     setLoading(true);
 
     try {
-      const categories = selectedCategory.Categories || [];
+      const categories = filters.category || [];
+
       const param = new URLSearchParams();
+
       categories.forEach((category: string) => {
         param.append("category", category);
       });
+
+      param.append("sort", filters.sort);
+
       const res = await fetch(`/api/products?${param.toString()}`);
 
       const data = await res.json();
@@ -45,7 +46,7 @@ export default function ProductGrid({
     try {
       const lastProduct = product[product.length - 1];
       const cursor = lastProduct ? lastProduct.id : undefined;
-      const categories = selectedCategory.Categories || [];
+      const categories = filters.category || [];
       const param = new URLSearchParams();
       if (cursor) {
         param.append("cursor", cursor.toString());
@@ -53,6 +54,7 @@ export default function ProductGrid({
       categories.forEach((category: string) => {
         param.append("category", category);
       });
+      param.append("sort", filters.sort);
 
       const res = await fetch(`/api/products?${param.toString()}`);
 
