@@ -5,6 +5,7 @@ import ProductGrid from "@/components/ProductGrid";
 import SideBar from "@/components/SideBar";
 import { useState } from "react";
 import CartView from "./CartView";
+import type { Filtertype } from "@/types/filter";
 
 export default function Home({ session, initialProducts, categories }: any) {
   const [cartItems, setCartItems]: any = useState([]);
@@ -21,6 +22,15 @@ export default function Home({ session, initialProducts, categories }: any) {
 
   const [cartOpen, setCartOpen] = useState(false);
 
+  const [selectedCategory, setSelectedCategory] = useState([]);
+
+  const [filters, setFilters] = useState<Filtertype>({
+    category: [],
+    sort: "latest",
+    search: "",
+  });
+
+  console.log("selected category in home view", selectedCategory);
   return (
     <div>
       <NavBar
@@ -34,7 +44,13 @@ export default function Home({ session, initialProducts, categories }: any) {
       <div className="h-screen flex bg-gray-100">
         {/*Side bar*/}
         <div className="w-80 bg-gray-300">
-          <SideBar categories={categories} />
+          <SideBar
+            categories={categories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            filters={filters}
+            setFilters={setFilters}
+          />
         </div>
         {/*Main content*/}
         <div className="flex-1 bg-green-500">
@@ -42,7 +58,12 @@ export default function Home({ session, initialProducts, categories }: any) {
           <div className="h-0 bg-pink-300"></div>
           {/* Product grid */}
           <div className="p-4">
-            <ProductGrid addToCart={addToCart} productData={initialProducts} />
+            <ProductGrid
+              addToCart={addToCart}
+              productData={initialProducts}
+              selectedCategory={selectedCategory}
+              filters={filters}
+            />
             {/* Cart */}
             <CartView cartOpen={cartOpen} setCartOpen={setCartOpen} />
           </div>

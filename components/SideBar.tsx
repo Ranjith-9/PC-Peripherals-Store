@@ -2,7 +2,13 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-export default function SideBar({ categories }: any) {
+export default function SideBar({
+  categories,
+  selectedCategory,
+  setSelectedCategory,
+  filters,
+  setFilters,
+}: any) {
   const options = [
     {
       title: "Categories",
@@ -25,7 +31,7 @@ export default function SideBar({ categories }: any) {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
-                  setSelectedOptions((prev: any) => ({
+                  setSelectedCategory((prev: any) => ({
                     ...prev,
                     [section.title]: [],
                   }));
@@ -61,10 +67,10 @@ export default function SideBar({ categories }: any) {
                 <input
                   type="checkbox"
                   checked={
-                    selectedOptions[section.title]?.includes(option) || false
+                    selectedCategory[section.title]?.includes(option) || false
                   }
                   onChange={() => {
-                    setSelectedOptions((prev: any) => {
+                    setSelectedCategory((prev: any) => {
                       const current = prev[section.title] || [];
 
                       const updated = current.includes(option)

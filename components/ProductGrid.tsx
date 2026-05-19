@@ -1,19 +1,61 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
 
-export default function ProductGrid({ addToCart, productData }: any) {
+export default function ProductGrid({
+  addToCart,
+  productData,
+  selectedCategory,
+}: any) {
   const [product, setProduct] = useState(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  useEffect(() => {
+    fetchProductsByCategory();
+  }, [selectedCategory]);
+
+  async function fetchProductsByCategory() {
+    setLoading(true);
+
+    try {
+      const categories = selectedCategory.Categories || [];
+      const param = new URLSearchParams();
+      categories.forEach((category: string) => {
+        param.append("category", category);
+      });
+      const res = await fetch(`/api/products?${param.toString()}`);
+
+      const data = await res.json();
+
+      setProduct(data.products);
+
+      setHasMore(data.hasMore);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function loadMore() {
+    // needs to be changed to fit the category filter
     if (loading || !hasMore) return;
     setLoading(true);
     try {
       const lastProduct = product[product.length - 1];
       const cursor = lastProduct ? lastProduct.id : undefined;
-      const res = await fetch(`/api/products?cursor=${cursor}`);
+      const categories = selectedCategory.Categories || [];
+      const param = new URLSearchParams();
+      if (cursor) {
+        param.append("cursor", cursor.toString());
+      }
+      categories.forEach((category: string) => {
+        param.append("category", category);
+      });
+
+      const res = await fetch(`/api/products?${param.toString()}`);
+
       const data = await res.json();
       setProduct((prev: any) => [...prev, ...data.products]);
       setHasMore(data.hasMore);
