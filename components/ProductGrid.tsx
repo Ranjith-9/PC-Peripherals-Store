@@ -25,6 +25,10 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
 
       param.append("sort", filters.sort);
 
+      if (filters.search) {
+        param.append("search", filters.search);
+      }
+
       const res = await fetch(`/api/products?${param.toString()}`);
 
       const data = await res.json();
@@ -55,6 +59,9 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
         param.append("category", category);
       });
       param.append("sort", filters.sort);
+      if (filters.search) {
+        param.append("search", filters.search);
+      }
 
       const res = await fetch(`/api/products?${param.toString()}`);
 

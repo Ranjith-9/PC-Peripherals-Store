@@ -2,6 +2,7 @@
 
 import { ShoppingCart, UserRound } from "lucide-react";
 import LoginButton from "./LoginButton";
+import SearchBar from "./SearchBar";
 
 export default function NavBar({
   session,
@@ -9,6 +10,9 @@ export default function NavBar({
   removeFromCart,
   cartItems,
   setCartOpen,
+  filters,
+  setFilters,
+  cartOpen,
 }: any) {
   return (
     <nav className="bg-gray-800 p-4">
@@ -16,7 +20,7 @@ export default function NavBar({
         {/* Left */}
         <div>Gaming Store XYZ</div>
         {/* Middle */}
-
+        <SearchBar filters={filters} setFilters={setFilters} />
         {/* Right */}
         <div className="flex items-center space-x-4">
           <div>

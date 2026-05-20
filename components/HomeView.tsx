@@ -38,6 +38,8 @@ export default function Home({ session, initialProducts, categories }: any) {
         cartItems={cartItems}
         setCartOpen={setCartOpen}
         cartOpen={cartOpen}
+        filters={filters}
+        setFilters={setFilters}
       />
       <div className="h-screen flex bg-gray-100">
         {/*Side bar*/}
@@ -69,12 +71,3 @@ export default function Home({ session, initialProducts, categories }: any) {
     </div>
   );
 }
-
-// Actions - Implement sorting
-/*
-1. Update the Filtertype to include a sort field (e.g., "latest", "price-asc", "price-desc").
-2. In the SideBar component, add a new section for sorting options (e.g., a dropdown or radio buttons).
-3. When the user selects a sorting option, update the filters state with the selected sort value.
-4. In the ProductGrid component, modify the fetchProductsByCategory function to include the sort parameter when fetching products from the API.
-5. Update the API endpoint to handle sorting based on the provided sort parameter and return products in the desired order.
-*/

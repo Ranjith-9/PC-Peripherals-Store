@@ -4,12 +4,16 @@ export async function getProducts(
   cursor?: string,
   category?: string[],
   sort: string = "latest",
+  search?: string,
 ) {
   const product = await db.product.findMany({
     take: 10,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     ...(category &&
       category.length > 0 && { where: { category: { in: category } } }),
+    ...(search && {
+      where: { name: { contains: search, mode: "insensitive" } },
+    }),
     orderBy:
       sort === "price_asc"
         ? [{ price: "asc" }, { id: "desc" }]
