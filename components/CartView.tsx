@@ -1,18 +1,86 @@
-export default function CartView({ cartOpen, setCartOpen }: any) {
-  const product = [
-    {
-      name: "Gaming Mouse",
-      price: 49.99,
-      quantity: 1,
-      image: "/images/gaming-mouse.jpg",
-    },
-    {
-      name: "Mechanical Keyboard",
-      price: 89.99,
-      quantity: 2,
-      image: "/images/mechanical-keyboard.jpg",
-    },
-  ];
+import { use, useEffect, useState } from "react";
+
+export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
+  const [displayedProducts, setDisplayedProducts] = useState<any[]>([]);
+  async function fetchProductsbyIds(ids: string[]) {
+    try {
+      const res = await fetch("/api/cartproduct", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+      const data = await res.json();
+
+      return data.products;
+    } catch (error) {
+      console.error("Failed to fetch products by IDs", error);
+      return [];
+    }
+  }
+
+  useEffect(() => {
+    async function loadProducts() {
+      if (cartItems.length > 0) {
+        const ids = cartItems.map((item: any) => item.productId);
+
+        const displayedProducts = await fetchProductsbyIds(ids);
+
+        const updatedProducts = displayedProducts.map((product: any) => {
+          const cartItem = cartItems.find(
+            (item: any) => item.productId === product.id,
+          );
+
+          return {
+            ...product,
+            quantity: cartItem?.quantity || 1,
+          };
+        });
+        setDisplayedProducts(updatedProducts);
+      }
+    }
+    loadProducts();
+  }, [cartItems]);
+
+  const incrementItem = async (productId: string) => {
+    const product = displayedProducts.find(
+      (item: any) => item.id === productId,
+    );
+
+    const currentQuantity = product?.quantity || 0;
+    const res = await fetch("/api/cart/increment", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ productId, currentQuantity }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Failed to increment item");
+      return;
+    }
+    setDisplayedProducts((prevProducts: any) =>
+      prevProducts.map((product: any) =>
+        product.id === productId
+          ? { ...product, quantity: product.quantity + 1 }
+          : product,
+      ),
+    );
+  };
+
+  const decrementItem = (productId: string) => {
+    setDisplayedProducts((prevProducts): any =>
+      prevProducts
+        .map((product: any) =>
+          product.id === productId
+            ? { ...product, quantity: product.quantity - 1 }
+            : product,
+        )
+        .filter((product: any) => product.quantity > 0),
+    );
+  };
 
   return (
     <>
@@ -48,7 +116,7 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
               </h1>
 
               <span className="text-sm text-gray-500">
-                {product.length} Items
+                {displayedProducts.length} Items
               </span>
             </div>
 
@@ -63,7 +131,7 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
           </div>
 
           {/* Empty State */}
-          {!product || product.length === 0 ? (
+          {!displayedProducts || displayedProducts.length === 0 ? (
             <div
               className="
         flex flex-col items-center justify-center
@@ -79,9 +147,9 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
             <>
               {/* Cart Items */}
               <div className="space-y-6">
-                {product.map((item) => (
+                {displayedProducts.map((product: any) => (
                   <div
-                    key={item.name}
+                    key={product.name}
                     className="
               flex items-center justify-between
               bg-white rounded-3xl
@@ -102,17 +170,17 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
                 "
                       >
                         <img
-                          src={item.image}
-                          alt={item.name}
+                          src={product.image}
+                          alt={product.name}
                           className="w-full h-full object-contain p-3"
                         />
                       </div>
 
                       <div>
-                        <h2 className="text-xl">{item.name}</h2>
+                        <h2 className="text-xl">{product.name}</h2>
 
                         <p className="text-md text-blue-900 mt-1">
-                          ${item.price.toFixed(2)}
+                          ${product.price.toFixed(2)}
                         </p>
                         <div className="flex items-center p-2">
                           <div
@@ -128,12 +196,15 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
                     hover:bg-gray-200
                     transition-colors
                   "
+                              onClick={() => {
+                                decrementItem(product.id);
+                              }}
                             >
                               -
                             </button>
 
                             <span className="w-2 text-center font-medium">
-                              {item.quantity}
+                              {product.quantity}
                             </span>
 
                             <button
@@ -143,6 +214,7 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
                     hover:bg-gray-200
                     transition-colors
                   "
+                              onClick={() => incrementItem(product.id)}
                             >
                               +
                             </button>
@@ -170,9 +242,10 @@ export default function CartView({ cartOpen, setCartOpen }: any) {
 
                   <h2 className="text-2xl font-bold">
                     $
-                    {product
+                    {displayedProducts
                       .reduce(
-                        (acc, item) => acc + item.price * item.quantity,
+                        (acc: number, product: any) =>
+                          acc + product.price * product.quantity,
                         0,
                       )
                       .toFixed(2)}

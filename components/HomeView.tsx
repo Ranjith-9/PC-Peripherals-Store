@@ -12,7 +12,31 @@ export default function Home({ session, initialProducts, categories }: any) {
   const [cartItems, setCartItems]: any = useState([]);
 
   const addToCart = (product: any) => {
-    setCartItems((prevItems: any) => [...prevItems, product]);
+    setCartItems((prevItems: any[]) => {
+      const existingItem = prevItems.find(
+        (item) => item.productId === product.id,
+      );
+
+      // Product already exists
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.productId === product.id
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+              }
+            : item,
+        );
+      }
+      // New product
+      return [
+        ...prevItems,
+        {
+          productId: product.id,
+          quantity: 1,
+        },
+      ];
+    });
   };
 
   const removeFromCart = (productId: any) => {
@@ -64,7 +88,11 @@ export default function Home({ session, initialProducts, categories }: any) {
               filters={filters}
             />
             {/* Cart */}
-            <CartView cartOpen={cartOpen} setCartOpen={setCartOpen} />
+            <CartView
+              cartOpen={cartOpen}
+              setCartOpen={setCartOpen}
+              cartItems={cartItems}
+            />
           </div>
         </div>
       </div>

@@ -9,9 +9,6 @@ export default async function Home() {
   const productFromDatabase = await getProducts();
   const productCategory = await getCategory();
 
-  console.log("products from database", productFromDatabase);
-  console.log("product categories", productCategory);
-
   return (
     <div>
       <HomeView

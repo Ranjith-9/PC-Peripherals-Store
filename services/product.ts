@@ -33,3 +33,21 @@ export async function getCategory() {
   });
   return category.map((item: any) => item.category);
 }
+
+export async function getProductByIds(ids: string[]) {
+  const product = await db.product.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+  return product;
+}
+
+export async function checkProductStock(productId: string) {
+  const product = await db.product.findUnique({
+    where: { id: productId },
+  });
+  return product.stock;
+}
