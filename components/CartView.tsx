@@ -1,7 +1,24 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import type { CartItem } from "./HomeView";
 
-export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
+interface CartViewProps {
+  cartOpen: boolean;
+  setCartOpen: Dispatch<SetStateAction<boolean>>;
+
+  cartItems: CartItem[];
+  setCartItems: Dispatch<SetStateAction<CartItem[]>>;
+}
+
+export default function CartView({
+  cartOpen,
+  setCartOpen,
+  cartItems,
+  setCartItems,
+}: CartViewProps) {
+  // ONLY fetched product info
   const [displayedProducts, setDisplayedProducts] = useState<any[]>([]);
+
   async function fetchProductsbyIds(ids: string[]) {
     try {
       const res = await fetch("/api/cartproduct", {
@@ -11,6 +28,7 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
         },
         body: JSON.stringify({ ids }),
       });
+
       const data = await res.json();
 
       return data.products;
@@ -20,65 +38,85 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
     }
   }
 
+  // ONLY refetch when product IDs change
+  const productIds = cartItems.map((item) => item.productId).join(",");
+
   useEffect(() => {
     async function loadProducts() {
       if (cartItems.length > 0) {
-        const ids = cartItems.map((item: any) => item.productId);
+        const ids = cartItems.map((item) => item.productId);
 
-        const displayedProducts = await fetchProductsbyIds(ids);
+        const fetchedProducts = await fetchProductsbyIds(ids);
 
-        const updatedProducts = displayedProducts.map((product: any) => {
-          const cartItem = cartItems.find(
-            (item: any) => item.productId === product.id,
-          );
-
-          return {
-            ...product,
-            quantity: cartItem?.quantity || 1,
-          };
-        });
-        setDisplayedProducts(updatedProducts);
+        setDisplayedProducts(fetchedProducts);
+      } else {
+        setDisplayedProducts([]);
       }
     }
+
     loadProducts();
-  }, [cartItems]);
+  }, [productIds]);
+
+  // MERGE quantity dynamically
+  const mergedProducts = useMemo(() => {
+    return displayedProducts.map((product: any) => {
+      const cartItem = cartItems.find((item) => item.productId === product.id);
+
+      return {
+        ...product,
+        quantity: cartItem?.quantity || 1,
+      };
+    });
+  }, [displayedProducts, cartItems]);
 
   const incrementItem = async (productId: string) => {
-    const product = displayedProducts.find(
-      (item: any) => item.id === productId,
-    );
+    const cartItem = cartItems.find((item) => item.productId === productId);
 
-    const currentQuantity = product?.quantity || 0;
+    const currentQuantity = cartItem?.quantity || 0;
+
     const res = await fetch("/api/cart/increment", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ productId, currentQuantity }),
+      body: JSON.stringify({
+        productId,
+        currentQuantity,
+      }),
     });
+
     const data = await res.json();
+
     if (!res.ok) {
       alert(data.error || "Failed to increment item");
       return;
     }
-    setDisplayedProducts((prevProducts: any) =>
-      prevProducts.map((product: any) =>
-        product.id === productId
-          ? { ...product, quantity: product.quantity + 1 }
-          : product,
+
+    // ONLY update cartItems
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.productId === productId
+          ? {
+              ...item,
+              quantity: item.quantity + 1,
+            }
+          : item,
       ),
     );
   };
 
   const decrementItem = (productId: string) => {
-    setDisplayedProducts((prevProducts): any =>
-      prevProducts
-        .map((product: any) =>
-          product.id === productId
-            ? { ...product, quantity: product.quantity - 1 }
-            : product,
+    setCartItems((prevItems) =>
+      prevItems
+        .map((item) =>
+          item.productId === productId
+            ? {
+                ...item,
+                quantity: item.quantity - 1,
+              }
+            : item,
         )
-        .filter((product: any) => product.quantity > 0),
+        .filter((item) => item.quantity > 0),
     );
   };
 
@@ -90,6 +128,7 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
           onClick={() => setCartOpen(false)}
         ></div>
       )}
+
       <div
         className={`
           fixed
@@ -110,13 +149,13 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
         <div className="max-w-4xl mx-auto p-6 text-black">
           {/* Header */}
           <div className="flex justify-between">
-            <div className=" items-center justify-between mb-8">
+            <div className="items-center justify-between mb-8">
               <h1 className="text-3xl font-bold tracking-tight">
                 Shopping Cart
               </h1>
 
               <span className="text-sm text-gray-500">
-                {displayedProducts.length} Items
+                {mergedProducts.length} Items
               </span>
             </div>
 
@@ -131,13 +170,13 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
           </div>
 
           {/* Empty State */}
-          {!displayedProducts || displayedProducts.length === 0 ? (
+          {!mergedProducts || mergedProducts.length === 0 ? (
             <div
               className="
-        flex flex-col items-center justify-center
-        py-24 rounded-3xl
-        bg-white shadow-sm border
-      "
+                flex flex-col items-center justify-center
+                py-24 rounded-3xl
+                bg-white shadow-sm border
+              "
             >
               <p className="text-xl font-semibold mb-2">Your cart is empty</p>
 
@@ -147,27 +186,27 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
             <>
               {/* Cart Items */}
               <div className="space-y-6">
-                {displayedProducts.map((product: any) => (
+                {mergedProducts.map((product: any) => (
                   <div
-                    key={product.name}
+                    key={product.id}
                     className="
-              flex items-center justify-between
-              bg-white rounded-3xl
-              p-1 shadow-sm
-              hover:shadow-md
-              transition-shadow duration-300
-            "
+                      flex items-center justify-between
+                      bg-white rounded-3xl
+                      p-1 shadow-sm
+                      hover:shadow-md
+                      transition-shadow duration-300
+                    "
                   >
                     {/* Left Side */}
                     <div className="flex items-center gap-5">
                       <div
                         className="
-                  w-24 h-24
-                  rounded-2xl
-                  bg-gray-100
-                  flex items-center justify-center
-                  overflow-hidden
-                "
+                          w-24 h-24
+                          rounded-2xl
+                          bg-gray-100
+                          flex items-center justify-center
+                          overflow-hidden
+                        "
                       >
                         <img
                           src={product.image}
@@ -182,20 +221,21 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
                         <p className="text-md text-blue-900 mt-1">
                           ${product.price.toFixed(2)}
                         </p>
+
                         <div className="flex items-center p-2">
                           <div
                             className="
-                  flex items-center
-                  bg-gray-100 rounded-full
-                "
+                              flex items-center
+                              bg-gray-100 rounded-full
+                            "
                           >
                             <button
                               className="
-                    w-9 h-9
-                    rounded-full
-                    hover:bg-gray-200
-                    transition-colors
-                  "
+                                w-9 h-9
+                                rounded-full
+                                hover:bg-gray-200
+                                transition-colors
+                              "
                               onClick={() => {
                                 decrementItem(product.id);
                               }}
@@ -209,11 +249,11 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
 
                             <button
                               className="
-                    w-9 h-9
-                    rounded-full
-                    hover:bg-gray-200
-                    transition-colors
-                  "
+                                w-9 h-9
+                                rounded-full
+                                hover:bg-gray-200
+                                transition-colors
+                              "
                               onClick={() => incrementItem(product.id)}
                             >
                               +
@@ -222,8 +262,6 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
                         </div>
                       </div>
                     </div>
-
-                    {/* Right Side */}
                   </div>
                 ))}
               </div>
@@ -231,18 +269,18 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
               {/* Footer */}
               <div
                 className="
-          mt-10
-          bg-white rounded-3xl
-          p-6 shadow-sm
-          flex items-center justify-between
-        "
+                  mt-10
+                  bg-white rounded-3xl
+                  p-6 shadow-sm
+                  flex items-center justify-between
+                "
               >
                 <div>
                   <p className="text-gray-500 text-sm">Total</p>
 
                   <h2 className="text-2xl font-bold">
                     $
-                    {displayedProducts
+                    {mergedProducts
                       .reduce(
                         (acc: number, product: any) =>
                           acc + product.price * product.quantity,
@@ -254,13 +292,13 @@ export default function CartView({ cartOpen, setCartOpen, cartItems }: any) {
 
                 <button
                   className="
-            bg-black text-white
-            px-8 py-4
-            rounded-2xl
-            hover:bg-gray-800
-            transition-colors
-            font-medium
-          "
+                    bg-black text-white
+                    px-8 py-4
+                    rounded-2xl
+                    hover:bg-gray-800
+                    transition-colors
+                    font-medium
+                  "
                 >
                   Checkout
                 </button>

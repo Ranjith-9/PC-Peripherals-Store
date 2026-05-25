@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
+import type { Product } from "@/types/product";
 
 export default function ProductGrid({ addToCart, productData, filters }: any) {
-  const [product, setProduct] = useState(productData);
+  const [product, setProduct] = useState<Product[]>(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
@@ -13,10 +14,8 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
 
   async function fetchProductsByCategory() {
     setLoading(true);
-
     try {
       const categories = filters.category || [];
-
       const param = new URLSearchParams();
 
       categories.forEach((category: string) => {
@@ -30,11 +29,9 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
       }
 
       const res = await fetch(`/api/products?${param.toString()}`);
-
       const data = await res.json();
 
       setProduct(data.products);
-
       setHasMore(data.hasMore);
     } catch (error) {
       console.error("Failed to fetch products", error);
@@ -78,7 +75,7 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
   return (
     <div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
-        {product.map((item: any, index: number) => (
+        {product.map((item: Product, index: number) => (
           <div
             className="flex items-center justify-center"
             key={item.id ?? index}

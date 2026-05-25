@@ -8,11 +8,11 @@ type SearchBarProps = {
 };
 
 export default function SearchBar({ filters, setFilters }: SearchBarProps) {
-  const [searchInput, setSearchInput] = useState(filters.search);
+  const [searchInput, setSearchInput] = useState<string>(filters.search);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setFilters((prev) => ({
+      setFilters((prev: Filtertype) => ({
         ...prev,
         search: searchInput,
       }));

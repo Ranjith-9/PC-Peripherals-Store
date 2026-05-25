@@ -1,6 +1,15 @@
 "use client";
+import type { Product } from "@/types/product";
 
-export default function ProductPanel({ addToCart, productData }: any) {
+interface ProductPanelProps {
+  addToCart: (product: Product) => void;
+  productData: Product;
+}
+
+export default function ProductPanel({
+  addToCart,
+  productData,
+}: ProductPanelProps) {
   return (
     <div className="">
       <div

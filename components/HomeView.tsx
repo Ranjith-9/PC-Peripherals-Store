@@ -1,17 +1,36 @@
 "use client";
-
+import { useState } from "react";
+//Components
 import NavBar from "@/components/NavBar";
 import ProductGrid from "@/components/ProductGrid";
 import SideBar from "@/components/SideBar";
-import { useState } from "react";
-import CartView from "./CartView";
-import type { Filtertype } from "@/types/filter";
 import SortBar from "./SortBar";
+import CartView from "./CartView";
 
-export default function Home({ session, initialProducts, categories }: any) {
-  const [cartItems, setCartItems]: any = useState([]);
+//Types
+import type { Filtertype } from "@/types/filter";
+import type { Session } from "@/types/user";
+import type { Product } from "@/types/product";
 
-  const addToCart = (product: any) => {
+interface HomeViewProps {
+  session: Session | null;
+  initialProducts: Product[];
+  categories: string[];
+}
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+}
+
+export default function Home({
+  session,
+  initialProducts,
+  categories,
+}: HomeViewProps) {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  const addToCart = (product: Product) => {
     setCartItems((prevItems: any[]) => {
       const existingItem = prevItems.find(
         (item) => item.productId === product.id,
@@ -39,11 +58,11 @@ export default function Home({ session, initialProducts, categories }: any) {
     });
   };
 
-  const removeFromCart = (productId: any) => {
-    setCartItems((prevItems: any) =>
-      prevItems.filter((item: any) => item.id !== productId),
-    );
-  };
+  // const removeFromCart = (productId: any) => {
+  //   setCartItems((prevItems: any) =>
+  //     prevItems.filter((item: any) => item.id !== productId),
+  //   );
+  // };
 
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -57,8 +76,6 @@ export default function Home({ session, initialProducts, categories }: any) {
     <div>
       <NavBar
         session={session}
-        addToCart={addToCart}
-        removeFromCart={removeFromCart}
         cartItems={cartItems}
         setCartOpen={setCartOpen}
         cartOpen={cartOpen}
@@ -92,6 +109,7 @@ export default function Home({ session, initialProducts, categories }: any) {
               cartOpen={cartOpen}
               setCartOpen={setCartOpen}
               cartItems={cartItems}
+              setCartItems={setCartItems}
             />
           </div>
         </div>

@@ -1,8 +1,19 @@
+export interface ProductAttributes {
+  dpi: string;
+  rgb: boolean;
+  brand: string;
+  weight: string;
+  connectivity: string;
+}
+
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
-  imageurl: string;
+  imageUrl: string;
+  category: string;
   stock: number;
+  attributes: ProductAttributes;
+  createdAt: Date;
 }

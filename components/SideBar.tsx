@@ -1,9 +1,20 @@
 "use client";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 import type { Filtertype } from "@/types/filter";
 
-export default function SideBar({ categories, filters, setFilters }: any) {
+interface SideBarProps {
+  categories: string[];
+  filters: Filtertype;
+  setFilters: Dispatch<SetStateAction<Filtertype>>;
+}
+
+export default function SideBar({
+  categories,
+  filters,
+  setFilters,
+}: SideBarProps) {
   const options = [
     {
       title: "Categories",

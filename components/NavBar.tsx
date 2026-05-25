@@ -3,17 +3,28 @@
 import { ShoppingCart, UserRound } from "lucide-react";
 import LoginButton from "./LoginButton";
 import SearchBar from "./SearchBar";
+import type { Session } from "@/types/user";
+import type { CartItem } from "./HomeView";
+import type { Dispatch, SetStateAction } from "react";
+import type { Filtertype } from "@/types/filter";
+
+interface NavBarProps {
+  session: Session | null;
+  cartItems: CartItem[];
+  setCartOpen: Dispatch<SetStateAction<boolean>>;
+  cartOpen: boolean;
+  filters: Filtertype;
+  setFilters: Dispatch<SetStateAction<Filtertype>>;
+}
 
 export default function NavBar({
   session,
-  addToCart,
-  removeFromCart,
   cartItems,
   setCartOpen,
   filters,
   setFilters,
   cartOpen,
-}: any) {
+}: NavBarProps) {
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -24,7 +35,7 @@ export default function NavBar({
         {/* Right */}
         <div className="flex items-center space-x-4">
           <div>
-            {session?.user?.image && (
+            {session?.user.image && (
               <img
                 src={session.user.image}
                 alt="User"
