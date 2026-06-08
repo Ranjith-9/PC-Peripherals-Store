@@ -16,4 +16,5 @@ export interface Product {
   stock: number;
   attributes: ProductAttributes;
   createdAt: Date;
+  slug: string;
 }

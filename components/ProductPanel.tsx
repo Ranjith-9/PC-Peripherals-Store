@@ -21,6 +21,7 @@ export default function ProductPanel({
         shadow-lg overflow-hidden
         hover:shadow-2xl
         transition-shadow duration-300
+        
       "
       >
         {/* Image */}

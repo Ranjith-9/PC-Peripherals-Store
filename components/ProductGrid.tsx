@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
 import type { Product } from "@/types/product";
+import Link from "next/link";
 
 export default function ProductGrid({ addToCart, productData, filters }: any) {
   const [product, setProduct] = useState<Product[]>(productData);
@@ -80,7 +81,9 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
             className="flex items-center justify-center"
             key={item.id ?? index}
           >
-            <ProductPanel addToCart={addToCart} productData={item} />
+            <Link href={`/product/${item.slug}`}>
+              <ProductPanel addToCart={addToCart} productData={item} />
+            </Link>
           </div>
         ))}
       </div>

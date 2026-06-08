@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DIRECT_URL")
+  url      = env("DIRECT_URL")
 }
 
 model User {
@@ -22,30 +22,27 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-
-  refresh_token     String? 
+  refresh_token     String?
   access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Product {
-  id             String   @id @default(cuid())
-  name           String
-  description    String
-  price          Float
-  imageUrl       String
-  category       String
-  stock          Int
-
-  attributes Json
-
-  createdAt      DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  imageUrl    String
+  category    String
+  stock       Int
+  createdAt   DateTime @default(now())
+  attributes  Json
+  slug        String?  @unique
 }

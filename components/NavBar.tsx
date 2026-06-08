@@ -7,24 +7,22 @@ import type { Session } from "@/types/user";
 import type { CartItem } from "./HomeView";
 import type { Dispatch, SetStateAction } from "react";
 import type { Filtertype } from "@/types/filter";
+import { useStore } from "@/providers/StoreProvider";
 
 interface NavBarProps {
   session: Session | null;
   cartItems: CartItem[];
   setCartOpen: Dispatch<SetStateAction<boolean>>;
   cartOpen: boolean;
-  filters: Filtertype;
-  setFilters: Dispatch<SetStateAction<Filtertype>>;
 }
 
 export default function NavBar({
   session,
   cartItems,
   setCartOpen,
-  filters,
-  setFilters,
   cartOpen,
 }: NavBarProps) {
+  const { filters, setFilters } = useStore();
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
