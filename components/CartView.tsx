@@ -1,23 +1,12 @@
+"use client";
 import { useEffect, useMemo, useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
-import type { CartItem } from "./HomeView";
+import { useStore } from "@/providers/StoreProvider";
 
-interface CartViewProps {
-  cartOpen: boolean;
-  setCartOpen: Dispatch<SetStateAction<boolean>>;
-
-  cartItems: CartItem[];
-  setCartItems: Dispatch<SetStateAction<CartItem[]>>;
-}
-
-export default function CartView({
-  cartOpen,
-  setCartOpen,
-  cartItems,
-  setCartItems,
-}: CartViewProps) {
+export default function CartView() {
   // ONLY fetched product info
   const [displayedProducts, setDisplayedProducts] = useState<any[]>([]);
+  const { cartOpen, setCartOpen } = useStore();
+  const { cartItems, setCartItems } = useStore();
 
   async function fetchProductsbyIds(ids: string[]) {
     try {
@@ -209,7 +198,7 @@ export default function CartView({
                         "
                       >
                         <img
-                          src={product.image}
+                          src={product.imageUrl}
                           alt={product.name}
                           className="w-full h-full object-contain p-3"
                         />

@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
 import type { Product } from "@/types/product";
 import Link from "next/link";
+import { useStore } from "@/providers/StoreProvider";
 
-export default function ProductGrid({ addToCart, productData, filters }: any) {
+export default function ProductGrid({ addToCart, productData }: any) {
   const [product, setProduct] = useState<Product[]>(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const { filters, setFilters } = useStore();
 
   useEffect(() => {
     fetchProductsByCategory();
@@ -81,9 +83,7 @@ export default function ProductGrid({ addToCart, productData, filters }: any) {
             className="flex items-center justify-center"
             key={item.id ?? index}
           >
-            <Link href={`/product/${item.slug}`}>
-              <ProductPanel addToCart={addToCart} productData={item} />
-            </Link>
+            <ProductPanel addToCart={addToCart} productData={item} />
           </div>
         ))}
       </div>

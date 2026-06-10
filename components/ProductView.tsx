@@ -1,14 +1,44 @@
 "use client";
+import { useStore } from "@/providers/StoreProvider";
 import { Product } from "@prisma/client";
 import { useState } from "react";
 
 export default function ProductView({ Product }: { Product: Product }) {
   const [quantity, setQuantity] = useState(1);
+  const { cartItems, setCartItems } = useStore();
 
   const attributes =
     Product.attributes && typeof Product.attributes === "object"
       ? Object.entries(Product.attributes as Record<string, any>)
       : [];
+
+  const addToCart = (product: Product) => {
+    setCartItems((prevItems: any[]) => {
+      const existingItem = prevItems.find(
+        (item) => item.productId === product.id,
+      );
+
+      // Product already exists
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.productId === product.id
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+              }
+            : item,
+        );
+      }
+      // New product
+      return [
+        ...prevItems,
+        {
+          productId: product.id,
+          quantity: 1,
+        },
+      ];
+    });
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 text-gray-800">
@@ -72,6 +102,7 @@ export default function ProductView({ Product }: { Product: Product }) {
 
           {/* Add To Cart */}
           <button
+            onClick={() => addToCart(Product)}
             className="
               bg-yellow-500
               hover:bg-yellow-400

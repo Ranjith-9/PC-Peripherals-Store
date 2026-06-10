@@ -1,13 +1,10 @@
+import { useStore } from "@/providers/StoreProvider";
 import type { Filtertype } from "@/types/filter";
 import { useEffect, useState } from "react";
 
-type SearchBarProps = {
-  filters: Filtertype;
+export default function SearchBar() {
+  const { filters, setFilters } = useStore();
 
-  setFilters: React.Dispatch<React.SetStateAction<Filtertype>>;
-};
-
-export default function SearchBar({ filters, setFilters }: SearchBarProps) {
   const [searchInput, setSearchInput] = useState<string>(filters.search);
 
   useEffect(() => {

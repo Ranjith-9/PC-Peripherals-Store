@@ -1,5 +1,6 @@
 "use client";
 import type { Product } from "@/types/product";
+import Link from "next/link";
 
 interface ProductPanelProps {
   addToCart: (product: Product) => void;
@@ -24,14 +25,16 @@ export default function ProductPanel({
         
       "
       >
-        {/* Image */}
-        <div className="h-[260px] overflow-hidden">
-          <img
-            src={productData.imageUrl}
-            alt={productData.name}
-            className="w-full h-full object-cover object-center"
-          />
-        </div>
+        <Link href={`/product/${productData.slug}`}>
+          {/* Image */}
+          <div className="h-[260px] overflow-hidden">
+            <img
+              src={productData.imageUrl}
+              alt={productData.name}
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+        </Link>
 
         {/* Sliding Bottom Section */}
         <div

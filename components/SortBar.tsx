@@ -1,4 +1,8 @@
-export default function SortBar({ filters, setFilters }: any) {
+import { useStore } from "@/providers/StoreProvider";
+
+export default function SortBar() {
+  const { filters, setFilters } = useStore();
+
   return (
     <div>
       <span className="text-sm font-medium">Sort by: </span>

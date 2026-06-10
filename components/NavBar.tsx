@@ -4,32 +4,26 @@ import { ShoppingCart, UserRound } from "lucide-react";
 import LoginButton from "./LoginButton";
 import SearchBar from "./SearchBar";
 import type { Session } from "@/types/user";
-import type { CartItem } from "./HomeView";
-import type { Dispatch, SetStateAction } from "react";
-import type { Filtertype } from "@/types/filter";
 import { useStore } from "@/providers/StoreProvider";
+import Link from "next/link";
 
 interface NavBarProps {
   session: Session | null;
-  cartItems: CartItem[];
-  setCartOpen: Dispatch<SetStateAction<boolean>>;
-  cartOpen: boolean;
 }
 
-export default function NavBar({
-  session,
-  cartItems,
-  setCartOpen,
-  cartOpen,
-}: NavBarProps) {
-  const { filters, setFilters } = useStore();
+export default function NavBar({ session }: NavBarProps) {
+  const { cartOpen, setCartOpen } = useStore();
+  const { cartItems } = useStore();
+
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left */}
-        <div>Gaming Store XYZ</div>
+        <Link href="/">
+          <div>Gaming Store XYZ</div>
+        </Link>
         {/* Middle */}
-        <SearchBar filters={filters} setFilters={setFilters} />
+        <SearchBar />
         {/* Right */}
         <div className="flex items-center space-x-4">
           <div>
