@@ -168,8 +168,7 @@ export default function CartView() {
               "
             >
               <p className="text-xl font-semibold mb-2">Your cart is empty</p>
-
-              <p className="text-gray-500">Add something you’d love to buy.</p>
+              <p className="text-gray-500">Add something you'd love to buy.</p>
             </div>
           ) : (
             <>

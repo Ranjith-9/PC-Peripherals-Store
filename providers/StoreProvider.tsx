@@ -3,7 +3,7 @@
 import { createContext, useContext, useState } from "react";
 import type { Filtertype } from "@/types/filter";
 
-type CartItem = {
+export type CartItem = {
   productId: string;
   quantity: number;
 };

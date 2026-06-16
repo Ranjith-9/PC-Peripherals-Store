@@ -2,6 +2,7 @@
 import { useStore } from "@/providers/StoreProvider";
 import { Product } from "@prisma/client";
 import { useState } from "react";
+import type { CartItem } from "@/providers/StoreProvider";
 
 export default function ProductView({ Product }: { Product: Product }) {
   const [quantity, setQuantity] = useState(1);
@@ -12,32 +13,54 @@ export default function ProductView({ Product }: { Product: Product }) {
       ? Object.entries(Product.attributes as Record<string, any>)
       : [];
 
-  const addToCart = (product: Product) => {
-    setCartItems((prevItems: any[]) => {
-      const existingItem = prevItems.find(
-        (item) => item.productId === product.id,
-      );
+  const addToCart = async (product: Product) => {
+    const cartItem = cartItems.find((item) => item.productId === product.id);
 
-      // Product already exists
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.productId === product.id
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
-            : item,
-        );
-      }
-      // New product
-      return [
-        ...prevItems,
-        {
-          productId: product.id,
-          quantity: 1,
+    const currentQuantity = cartItem?.quantity ?? 0;
+
+    try {
+      const res = await fetch("/api/cart/increment", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ];
-    });
+        body: JSON.stringify({
+          productId: product.id,
+          currentQuantity,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to increment item");
+        return;
+      }
+
+      if (cartItem) {
+        setCartItems((prev) =>
+          prev.map((item) =>
+            item.productId === product.id
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                }
+              : item,
+          ),
+        );
+      } else {
+        setCartItems((prev) => [
+          ...prev,
+          {
+            productId: product.id,
+            quantity: 1,
+          },
+        ]);
+      }
+    } catch (err) {
+      alert("Network error");
+      console.error(err);
+    }
   };
 
   return (

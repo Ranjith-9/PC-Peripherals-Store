@@ -22,32 +22,54 @@ export interface CartItem {
 export default function Home({ initialProducts, categories }: HomeViewProps) {
   const { cartItems, setCartItems } = useStore();
 
-  const addToCart = (product: Product) => {
-    setCartItems((prevItems: any[]) => {
-      const existingItem = prevItems.find(
-        (item) => item.productId === product.id,
-      );
+  const addToCart = async (product: Product) => {
+    const cartItem = cartItems.find((item) => item.productId === product.id);
 
-      // Product already exists
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.productId === product.id
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
-            : item,
-        );
-      }
-      // New product
-      return [
-        ...prevItems,
-        {
-          productId: product.id,
-          quantity: 1,
+    const currentQuantity = cartItem?.quantity ?? 0;
+
+    try {
+      const res = await fetch("/api/cart/increment", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ];
-    });
+        body: JSON.stringify({
+          productId: product.id,
+          currentQuantity,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to increment item");
+        return;
+      }
+
+      if (cartItem) {
+        setCartItems((prev) =>
+          prev.map((item) =>
+            item.productId === product.id
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                }
+              : item,
+          ),
+        );
+      } else {
+        setCartItems((prev) => [
+          ...prev,
+          {
+            productId: product.id,
+            quantity: 1,
+          },
+        ]);
+      }
+    } catch (err) {
+      alert("Network error");
+      console.error(err);
+    }
   };
 
   // const removeFromCart = (productId: any) => {
