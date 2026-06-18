@@ -14,6 +14,8 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
+
+  address Address[]
 }
 
 model Account {
@@ -45,4 +47,19 @@ model Product {
   createdAt   DateTime @default(now())
   attributes  Json
   slug        String?  @unique
+}
+
+model Address {
+  id            String    @id @default(cuid())
+  userId        String
+  firstName     String
+  lastName      String
+  phone         String
+  addressLine1  String
+  addressLine2  String?
+  city          String
+  state         String
+  postalCode    String
+  isDefault     Boolean   @default(false)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

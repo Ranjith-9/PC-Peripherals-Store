@@ -1,67 +1,17 @@
 "use client";
 import { useStore } from "@/providers/StoreProvider";
-import { Product } from "@prisma/client";
 import { useState } from "react";
-import type { CartItem } from "@/providers/StoreProvider";
+import type { Product } from "@/types/product";
 
 export default function ProductView({ Product }: { Product: Product }) {
   const [quantity, setQuantity] = useState(1);
-  const { cartItems, setCartItems } = useStore();
 
   const attributes =
     Product.attributes && typeof Product.attributes === "object"
       ? Object.entries(Product.attributes as Record<string, any>)
       : [];
 
-  const addToCart = async (product: Product) => {
-    const cartItem = cartItems.find((item) => item.productId === product.id);
-
-    const currentQuantity = cartItem?.quantity ?? 0;
-
-    try {
-      const res = await fetch("/api/cart/increment", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId: product.id,
-          currentQuantity,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.error || "Failed to increment item");
-        return;
-      }
-
-      if (cartItem) {
-        setCartItems((prev) =>
-          prev.map((item) =>
-            item.productId === product.id
-              ? {
-                  ...item,
-                  quantity: item.quantity + 1,
-                }
-              : item,
-          ),
-        );
-      } else {
-        setCartItems((prev) => [
-          ...prev,
-          {
-            productId: product.id,
-            quantity: 1,
-          },
-        ]);
-      }
-    } catch (err) {
-      alert("Network error");
-      console.error(err);
-    }
-  };
+  const { addToCart } = useStore();
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 text-gray-800">

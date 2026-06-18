@@ -1,16 +1,15 @@
 "use client";
+import { useStore } from "@/providers/StoreProvider";
 import type { Product } from "@/types/product";
 import Link from "next/link";
 
 interface ProductPanelProps {
-  addToCart: (product: Product) => void;
   productData: Product;
 }
 
-export default function ProductPanel({
-  addToCart,
-  productData,
-}: ProductPanelProps) {
+export default function ProductPanel({ productData }: ProductPanelProps) {
+  const { addToCart } = useStore();
+
   return (
     <div className="">
       <div
@@ -25,7 +24,7 @@ export default function ProductPanel({
         
       "
       >
-        <Link href={`/product/${productData.slug}`}>
+        <Link href={`/shop/product/${productData.slug}`}>
           {/* Image */}
           <div className="h-[260px] overflow-hidden">
             <img

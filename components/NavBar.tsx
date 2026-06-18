@@ -19,7 +19,7 @@ export default function NavBar({ session }: NavBarProps) {
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left */}
-        <Link href="/">
+        <Link href="/shop">
           <div>Gaming Store XYZ</div>
         </Link>
         {/* Middle */}

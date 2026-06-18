@@ -51,3 +51,14 @@ export async function checkProductStock(productId: string) {
   });
   return product.stock;
 }
+
+export async function getAddress(email: string) {
+  const userId = await db.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+  const address = await db.address.findMany({
+    where: { userId: userId?.id },
+  });
+  return address;
+}

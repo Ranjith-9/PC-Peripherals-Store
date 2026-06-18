@@ -5,7 +5,11 @@ import type { Product } from "@/types/product";
 import Link from "next/link";
 import { useStore } from "@/providers/StoreProvider";
 
-export default function ProductGrid({ addToCart, productData }: any) {
+export default function ProductGrid({
+  productData,
+}: {
+  productData: Product[];
+}) {
   const [product, setProduct] = useState<Product[]>(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -83,7 +87,7 @@ export default function ProductGrid({ addToCart, productData }: any) {
             className="flex items-center justify-center"
             key={item.id ?? index}
           >
-            <ProductPanel addToCart={addToCart} productData={item} />
+            <ProductPanel productData={item} />
           </div>
         ))}
       </div>
