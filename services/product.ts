@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import type { CreateAddressInput } from "@/types/input";
 
 export async function getProducts(
   cursor?: string,
@@ -52,7 +53,15 @@ export async function checkProductStock(productId: string) {
   return product.stock;
 }
 
+export async function checkProducts(productIds: string[]) {
+  const product = await db.product.findMany({
+    where: { id: { in: productIds } },
+  });
+  return product;
+}
+
 export async function getAddress(email: string) {
+  if (!email) return [];
   const userId = await db.user.findUnique({
     where: { email },
     select: { id: true },
@@ -62,3 +71,22 @@ export async function getAddress(email: string) {
   });
   return address;
 }
+
+export async function addAddress(userId: string, data: CreateAddressInput) {
+  return await db.address.create({
+    data: {
+      userId: userId,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone,
+      addressLine1: data.addressLine1,
+      addressLine2: data.addressLine2,
+      city: data.city,
+      state: data.state,
+      postalCode: data.postalCode,
+      isDefault: data.isDefault ?? false,
+    },
+  });
+}
+
+export async function deleteAddress() {}

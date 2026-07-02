@@ -1,191 +1,280 @@
-import { useState } from "react";
+"use client";
 
-export default function AddressForm() {
-  const [formData, setFormData] = useState({
+import { X, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Address } from "@prisma/client";
+import type { Dispatch, SetStateAction } from "react";
+
+interface AddressModalProps {
+  open: boolean;
+  onClose: () => void;
+  header: boolean;
+  savedAddress?: Address[];
+  onAddressAdded: (newAddress: Address) => void;
+  onDifferentAddress?: (diffAddress: any) => void;
+}
+
+export default function AddressModal({
+  open,
+  onClose,
+  header,
+  savedAddress,
+  onAddressAdded,
+  onDifferentAddress,
+}: AddressModalProps) {
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [form, setForm] = useState({
     firstName: "",
     lastName: "",
-    contactNumber: "",
-    address: "",
+    addressLine1: "",
+    addressLine2: "",
+    phone: "",
     city: "",
     state: "",
     postalCode: "",
+    isDefault: false,
   });
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) {
-    const { name, value } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value, type } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
+    const updatedForm = {
+      ...form,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+    };
 
-      [name]: value,
-    }));
-  }
+    setForm(updatedForm);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    onDifferentAddress?.(updatedForm);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(formData);
+    const response = await fetch("/api/address", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
 
-    // call API here
-  }
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(result.message);
+      return;
+    }
+
+    onAddressAdded(result); // Call the callback function with the new address
+
+    alert("Address added successfully!");
+
+    onClose();
+  };
+
+  if (!open) return null;
+
+  const handleAddressSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+
+    setSelectedAddressId(id);
+
+    const address = savedAddress?.find((address) => address.id === id);
+
+    if (!address) return;
+
+    setForm({
+      firstName: address.firstName,
+      lastName: address.lastName,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2 ?? "",
+      phone: address.phone,
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      isDefault: address.isDefault,
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 max-w-xl text-black">
-      <h2 className="text-2xl font-semibold">Shipping Details</h2>
+    <div className="">
+      {/* Header */}
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block mb-1">First Name</label>
+      {header && (
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-semibold">Add address</h1>
 
+          <button onClick={onClose}>
+            <X />
+          </button>
+        </div>
+      )}
+
+      {/* Form */}
+
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        {/* Saved address */}
+        <select value={selectedAddressId} onChange={handleAddressSelect}>
+          <option value="">Select an address</option>
+
+          {savedAddress?.map((address) => (
+            <option key={address.id} value={address.id}>
+              {`${address.firstName} ${address.lastName},
+      ${address.addressLine1},
+      ${address.city}`}
+            </option>
+          ))}
+        </select>
+
+        {/* First Last */}
+
+        <div className="grid grid-cols-2 gap-4">
           <input
-            type="text"
             name="firstName"
-            value={formData.firstName}
+            placeholder="First name"
+            value={form.firstName}
             onChange={handleChange}
-            required
-            className="
-              w-full
-              border
-              rounded-md
-              px-3
-              py-2
-            "
+            className="rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
           />
-        </div>
-
-        <div>
-          <label className="block mb-1">Last Name</label>
 
           <input
-            type="text"
             name="lastName"
-            value={formData.lastName}
+            placeholder="Last name"
+            value={form.lastName}
             onChange={handleChange}
-            required
-            className="
-              w-full
-              border
-              rounded-md
-              px-3
-              py-2
-            "
+            className="rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
           />
         </div>
-      </div>
 
-      <div>
-        <label className="block mb-1">Contact Number</label>
+        {/* Address */}
+
+        <div className="relative">
+          <input
+            name="addressLine1"
+            placeholder="Address"
+            value={form.addressLine1}
+            onChange={handleChange}
+            className="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 outline-none focus:border-blue-500"
+          />
+
+          <Search
+            className="
+                absolute
+                right-4
+                top-1/2
+                -translate-y-1/2
+                text-gray-400
+              "
+            size={18}
+          />
+        </div>
+
+        {/* Apartment */}
 
         <input
-          type="tel"
-          name="contactNumber"
-          value={formData.contactNumber}
+          name="addressLine2"
+          placeholder="Apartment, suite, etc. (optional)"
+          value={form.addressLine2}
           onChange={handleChange}
-          required
-          className="
-            w-full
-            border
-            rounded-md
-            px-3
-            py-2
-          "
+          className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
         />
-      </div>
 
-      <div>
-        <label className="block mb-1">Address</label>
+        {/* Phone */}
 
-        <textarea
-          name="address"
-          value={formData.address}
+        <input
+          name="phone"
+          placeholder="Phone number"
+          value={form.phone}
           onChange={handleChange}
-          rows={4}
-          required
-          className="
-            w-full
-            border
-            rounded-md
-            px-3
-            py-2
-            resize-none
-          "
+          className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
         />
-      </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label className="block mb-1">City</label>
+        {/* City State Pin */}
 
+        <div className="grid grid-cols-3 gap-4">
           <input
-            type="text"
             name="city"
-            value={formData.city}
+            placeholder="City"
+            value={form.city}
             onChange={handleChange}
-            required
-            className="
-              w-full
-              border
-              rounded-md
-              px-3
-              py-2
-            "
+            className="rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
           />
-        </div>
 
-        <div>
-          <label className="block mb-1">State</label>
-
-          <input
-            type="text"
+          <select
             name="state"
-            value={formData.state}
+            value={form.state}
             onChange={handleChange}
-            required
-            className="
-              w-full
-              border
-              rounded-md
-              px-3
-              py-2
-            "
-          />
-        </div>
+            className="rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+          >
+            <option value="">State</option>
 
-        <div>
-          <label className="block mb-1">Postal Code</label>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+
+            <option value="Karnataka">Karnataka</option>
+
+            <option value="Kerala">Kerala</option>
+          </select>
 
           <input
-            type="text"
             name="postalCode"
-            value={formData.postalCode}
+            placeholder="PIN code"
+            value={form.postalCode}
             onChange={handleChange}
-            required
-            className="
-              w-full
-              border
-              rounded-md
-              px-3
-              py-2
-            "
+            className="rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
           />
         </div>
-      </div>
 
-      <button
-        type="submit"
-        className="
-          px-6
-          py-3
-          rounded-md
-          bg-black
-          text-white
-          hover:opacity-90
-        "
-      >
-        Continue to Payment
-      </button>
-    </form>
+        {/* Default */}
+
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            name="isDefault"
+            checked={form.isDefault}
+            onChange={handleChange}
+            className="h-4 w-4"
+          />
+
+          <span>This is my default address</span>
+        </label>
+
+        {/* Footer */}
+
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="
+                rounded-md
+                border
+                border-gray-300
+                py-3
+                font-medium
+                hover:bg-gray-50
+              "
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="
+                rounded-md
+                bg-blue-600
+                py-3
+                font-medium
+                text-white
+                hover:bg-blue-700
+              "
+          >
+            Save address
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

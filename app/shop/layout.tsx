@@ -19,14 +19,10 @@ export default async function RootLayout({
   const session: Session | null = await getServerSession(); // Fetch session data on the server side
 
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <StoreProvider>
-          <NavBar session={session} />
-          <CartView />
-          {children}
-        </StoreProvider>
-      </body>
-    </html>
+    <>
+      <NavBar session={session} />
+      <CartView />
+      {children}
+    </>
   );
 }

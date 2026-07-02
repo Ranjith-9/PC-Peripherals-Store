@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/providers/StoreProvider";
+import Link from "next/link";
 
 export default function CartView() {
   // ONLY fetched product info
@@ -176,8 +176,10 @@ export default function CartView() {
                   </h2>
                 </div>
 
-                <button
-                  className="
+                <Link href="/checkout">
+                  {" "}
+                  <button
+                    className="
                     bg-black text-white
                     px-8 py-4
                     rounded-2xl
@@ -185,9 +187,10 @@ export default function CartView() {
                     transition-colors
                     font-medium
                   "
-                >
-                  Checkout
-                </button>
+                  >
+                    Checkout
+                  </button>
+                </Link>
               </div>
             </>
           )}

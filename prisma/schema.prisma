@@ -16,6 +16,7 @@ model User {
   accounts      Account[]
 
   address Address[]
+  orders  Order[]
 }
 
 model Account {
@@ -37,29 +38,87 @@ model Account {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
   description String
   price       Float
   imageUrl    String
   category    String
   stock       Int
-  createdAt   DateTime @default(now())
+  createdAt   DateTime    @default(now())
   attributes  Json
-  slug        String?  @unique
+  slug        String?     @unique
+  orderItems  OrderItem[]
 }
 
 model Address {
-  id            String    @id @default(cuid())
-  userId        String
-  firstName     String
-  lastName      String
-  phone         String
-  addressLine1  String
-  addressLine2  String?
-  city          String
-  state         String
-  postalCode    String
-  isDefault     Boolean   @default(false)
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String  @id @default(cuid())
+  userId       String
+  firstName    String
+  lastName     String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  isDefault    Boolean @default(false)
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PAYPAL
+  CARD
+  CASH_ON_DELIVERY
+}
+
+enum ShippingMethod {
+  STANDARD
+  EXPRESS
+}
+
+model Order {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status OrderStatus @default(PENDING)
+
+  paymentMethod  PaymentMethod
+  shippingMethod ShippingMethod
+
+  totalAmount Float
+
+  shippingAddress Json
+  billingAddress  Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+
+  unitPrice Float
+
+  subtotal Float
 }

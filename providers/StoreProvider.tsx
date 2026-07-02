@@ -45,7 +45,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const [cartOpen, setCartOpen] = useState(false);
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+
+    const stored = localStorage.getItem("cart");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    const stored = localStorage.getItem("cart");
+
+    if (stored) {
+      setCartItems(JSON.parse(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const [displayedProducts, setDisplayedProducts] = useState([]);
 
