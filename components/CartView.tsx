@@ -186,6 +186,7 @@ export default function CartView() {
                     hover:bg-gray-800
                     transition-colors
                     font-medium
+                    transition active:scale-95
                   "
                   >
                     Checkout

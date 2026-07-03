@@ -125,6 +125,20 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
     setCartItems([]);
   };
 
+  useEffect(() => {
+    const script = document.createElement("script");
+
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <>
       {/* Background Layer */}
@@ -474,7 +488,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
             </div>
             <div className="mt-10 items-center flex justify-center">
               <button
-                className="bg-black w-50 h-10 rounded-full text-white font-bold"
+                className="bg-black w-50 h-10 rounded-full text-white font-bold transition active:scale-95"
                 onClick={handlePlaceOrder}
               >
                 Place order

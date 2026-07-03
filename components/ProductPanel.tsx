@@ -21,7 +21,6 @@ export default function ProductPanel({ productData }: ProductPanelProps) {
         shadow-lg overflow-hidden
         hover:shadow-2xl
         transition-shadow duration-300
-        
       "
       >
         <Link href={`/shop/product/${productData.slug}`}>
@@ -72,6 +71,7 @@ export default function ProductPanel({ productData }: ProductPanelProps) {
         py-2 rounded-xl
         hover:bg-gray-800
         transition-colors
+        transition active:scale-95
       "
               onClick={() => addToCart(productData)}
             >
