@@ -4,7 +4,7 @@ import { decrementStock, setOrders } from "@/services/order";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { db } from "@/lib/db";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client/edge";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,15 +15,12 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await req.json();
-
     const productIds = data.cartItems.map((item: any) => item.productId);
-
     const products = await checkProducts(productIds);
 
     const productMap = new Map(
-      products.map((product: any) => [product.id, product]),
+      products.map((product: any) => [product.id, product])
     );
-
     for (const item of data.cartItems) {
       const product: any = productMap.get(item.productId);
       const subTotalClient = item.quantity * item.price;
@@ -31,23 +28,20 @@ export async function POST(req: NextRequest) {
       if (!product) {
         return NextResponse.json(
           { error: "product doesnt exist" },
-          { status: 400 },
+          { status: 400 }
         );
       }
-
       const subTotalServer = item.quantity * product.price;
-
       if (product.stock < item.quantity) {
         return NextResponse.json(
           { error: "product out of stock" },
-          { status: 400 },
+          { status: 400 }
         );
       }
-
       if (subTotalClient !== subTotalServer) {
         return NextResponse.json(
           { error: "Product price mismatch" },
-          { status: 400 },
+          { status: 400 }
         );
       }
     }
@@ -58,23 +52,22 @@ export async function POST(req: NextRequest) {
           tx,
           session.user.id,
           data,
-          data.cartItems,
+          data.cartItems
         );
         await decrementStock(tx, data.cartItems);
 
         return order;
-      },
+      }
     );
 
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);
-
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

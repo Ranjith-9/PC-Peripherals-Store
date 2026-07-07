@@ -1,7 +1,7 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import type { Session } from "@/types/user";
-import { Address } from "@prisma/client";
+import { Address } from "@prisma/client/edge";
 import { ChevronDown, Plus, EllipsisVertical, Handbag } from "lucide-react";
 import AddressModal from "./AddressForm";
 import { signOut } from "next-auth/react";
@@ -23,7 +23,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
   const shippingModes = ["STANDARD", "EXPRESS"];
   const paymentMethods = ["PAYPAL", "CARD", "CASH_ON_DELIVERY"];
   const [selectAddress, setSelectAddress] = useState<Address | null>(
-    address.find((addr) => addr.isDefault) ?? address[0] ?? null,
+    address.find((addr) => addr.isDefault) ?? address[0] ?? null
   );
   const [differentAddress, setDifferentAddress] = useState();
   const [isShippingOpen, setIsShippingOpen] = useState(false);
@@ -51,7 +51,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
     }
 
     const remainingAddresses = address.filter(
-      (currentAddress) => currentAddress.id !== addressId,
+      (currentAddress) => currentAddress.id !== addressId
     );
 
     setAddress(remainingAddresses);
@@ -73,9 +73,42 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
   useEffect(() => {
     setSelectAddress(
-      address.find((addr) => addr.isDefault) ?? address[0] ?? null,
+      address.find((addr) => addr.isDefault) ?? address[0] ?? null
     );
   }, [address]);
+
+  function openRazorpay(order, checkoutData) {
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+
+      amount: order.amount,
+
+      currency: order.currency,
+
+      order_id: order.id,
+
+      handler: async function (response) {
+        // Payment succeeded
+        const verifyResponse = await fetch("/api/payment/verify", {
+          method: "POST",
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            data: checkoutData,
+          }),
+        });
+
+        const result = await verifyResponse.json();
+
+        console.log(result);
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+
+    razorpay.open();
+  }
 
   const handlePlaceOrder = async () => {
     let shippingAddressSelected;
@@ -94,7 +127,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
       billingAddress: shippingAddressSelected,
       totalAmount: mergedProducts.reduce(
         (acc: number, product: any) => acc + product.price * product.quantity,
-        0,
+        0
       ),
       cartItems: mergedProducts.map((product) => ({
         productId: product.id,
@@ -106,7 +139,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
     console.log("data before being called for API", data);
 
-    const response = await fetch("/api/order", {
+    const response = await fetch("/api/create-order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,12 +147,14 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
+    const razorpayOrder = await response.json();
 
     if (!response.ok) {
-      alert(result.error);
+      alert(razorpayOrder.error);
       return;
     }
+
+    openRazorpay(razorpayOrder, data);
 
     alert("Order Placed Successfully");
     setCartItems([]);
@@ -207,7 +242,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                 setAddress((currentAddresses) => {
                                   if (newAddress.isDefault) {
                                     currentAddresses.map(
-                                      (address) => (address.isDefault = false),
+                                      (address) => (address.isDefault = false)
                                     );
                                   }
 
@@ -289,8 +324,8 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                             prev.map((addr) =>
                                               addr.id === address.id
                                                 ? { ...addr, isDefault: true }
-                                                : { ...addr, isDefault: false },
-                                            ),
+                                                : { ...addr, isDefault: false }
+                                            )
                                           )
                                         }
                                       >
@@ -358,10 +393,10 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                 if (newAddress.isDefault) {
                                   console.log(
                                     "newAddress.isDefault",
-                                    newAddress.isDefault,
+                                    newAddress.isDefault
                                   );
                                   currentAddresses.map(
-                                    (address) => (address.isDefault = false),
+                                    (address) => (address.isDefault = false)
                                   );
                                 }
 
@@ -468,10 +503,10 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                           if (newAddress.isDefault) {
                             console.log(
                               "newAddress.isDefault",
-                              newAddress.isDefault,
+                              newAddress.isDefault
                             );
                             currentAddresses.map(
-                              (address) => (address.isDefault = false),
+                              (address) => (address.isDefault = false)
                             );
                           }
 
@@ -539,7 +574,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                   .reduce(
                     (acc: number, product: any) =>
                       acc + product.price * product.quantity,
-                    0,
+                    0
                   )
                   .toFixed(2)}
               </div>
