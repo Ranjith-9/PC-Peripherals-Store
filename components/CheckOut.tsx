@@ -7,6 +7,8 @@ import AddressModal from "./AddressForm";
 import { signOut } from "next-auth/react";
 import { useStore } from "@/providers/StoreProvider";
 import Link from "next/link";
+import type { CreateOrderRequest, razerPayOrder } from "@/types/order";
+import { useRouter } from "next/navigation";
 
 interface CheckOutProps {
   session: Session | null;
@@ -14,6 +16,7 @@ interface CheckOutProps {
 }
 
 export default function CheckOut({ session, addresses }: CheckOutProps) {
+  const router = useRouter();
   const [address, setAddress] = useState<Address[]>(addresses);
   const [openSection, setOpenSection] = useState({
     addSection: false,
@@ -23,7 +26,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
   const shippingModes = ["STANDARD", "EXPRESS"];
   const paymentMethods = ["PAYPAL", "CARD", "CASH_ON_DELIVERY"];
   const [selectAddress, setSelectAddress] = useState<Address | null>(
-    address.find((addr) => addr.isDefault) ?? address[0] ?? null
+    address.find((addr) => addr.isDefault) ?? address[0] ?? null,
   );
   const [differentAddress, setDifferentAddress] = useState();
   const [isShippingOpen, setIsShippingOpen] = useState(false);
@@ -37,6 +40,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
   const { mergedProducts } = useStore();
   const { setCartItems } = useStore();
+  const { setPlacedOrder } = useStore();
 
   const handleDelete = async (addressId: string) => {
     const response = await fetch(`/api/address/${addressId}`, {
@@ -51,7 +55,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
     }
 
     const remainingAddresses = address.filter(
-      (currentAddress) => currentAddress.id !== addressId
+      (currentAddress) => currentAddress.id !== addressId,
     );
 
     setAddress(remainingAddresses);
@@ -73,11 +77,14 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
   useEffect(() => {
     setSelectAddress(
-      address.find((addr) => addr.isDefault) ?? address[0] ?? null
+      address.find((addr) => addr.isDefault) ?? address[0] ?? null,
     );
   }, [address]);
 
-  function openRazorpay(order, checkoutData) {
+  function openRazorpay(
+    order: razerPayOrder,
+    checkoutData: CreateOrderRequest,
+  ) {
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
 
@@ -87,7 +94,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
       order_id: order.id,
 
-      handler: async function (response) {
+      handler: async function (response: any) {
         // Payment succeeded
         const verifyResponse = await fetch("/api/payment/verify", {
           method: "POST",
@@ -101,11 +108,14 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
         const result = await verifyResponse.json();
 
-        console.log(result);
+        setPlacedOrder(checkoutData);
+        setCartItems([]);
+
+        router.push(`/checkout/order`);
       },
     };
 
-    const razorpay = new window.Razorpay(options);
+    const razorpay = new (window as any).Razorpay(options);
 
     razorpay.open();
   }
@@ -119,7 +129,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
       shippingAddressSelected = differentAddress;
     }
 
-    const data = {
+    const data: CreateOrderRequest = {
       status: "pending",
       paymentMethod: selectPaymentMode,
       shippingMethod: selectedShipping,
@@ -127,19 +137,18 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
       billingAddress: shippingAddressSelected,
       totalAmount: mergedProducts.reduce(
         (acc: number, product: any) => acc + product.price * product.quantity,
-        0
+        0,
       ),
       cartItems: mergedProducts.map((product) => ({
         productId: product.id,
         quantity: product.quantity,
         price: product.price,
         subtotal: product.price * product.quantity,
+        imageUrl: product.imageUrl,
       })),
     };
 
-    console.log("data before being called for API", data);
-
-    const response = await fetch("/api/create-order", {
+    const response = await fetch("/api/payment/create-order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -148,6 +157,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
     });
 
     const razorpayOrder = await response.json();
+    console.log("razorPayOrder from create-order", razorpayOrder);
 
     if (!response.ok) {
       alert(razorpayOrder.error);
@@ -155,9 +165,6 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
     }
 
     openRazorpay(razorpayOrder, data);
-
-    alert("Order Placed Successfully");
-    setCartItems([]);
   };
 
   useEffect(() => {
@@ -242,7 +249,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                 setAddress((currentAddresses) => {
                                   if (newAddress.isDefault) {
                                     currentAddresses.map(
-                                      (address) => (address.isDefault = false)
+                                      (address) => (address.isDefault = false),
                                     );
                                   }
 
@@ -324,8 +331,8 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                             prev.map((addr) =>
                                               addr.id === address.id
                                                 ? { ...addr, isDefault: true }
-                                                : { ...addr, isDefault: false }
-                                            )
+                                                : { ...addr, isDefault: false },
+                                            ),
                                           )
                                         }
                                       >
@@ -393,10 +400,10 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                 if (newAddress.isDefault) {
                                   console.log(
                                     "newAddress.isDefault",
-                                    newAddress.isDefault
+                                    newAddress.isDefault,
                                   );
                                   currentAddresses.map(
-                                    (address) => (address.isDefault = false)
+                                    (address) => (address.isDefault = false),
                                   );
                                 }
 
@@ -503,10 +510,10 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                           if (newAddress.isDefault) {
                             console.log(
                               "newAddress.isDefault",
-                              newAddress.isDefault
+                              newAddress.isDefault,
                             );
                             currentAddresses.map(
-                              (address) => (address.isDefault = false)
+                              (address) => (address.isDefault = false),
                             );
                           }
 
@@ -574,7 +581,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                   .reduce(
                     (acc: number, product: any) =>
                       acc + product.price * product.quantity,
-                    0
+                    0,
                   )
                   .toFixed(2)}
               </div>

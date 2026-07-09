@@ -23,6 +23,9 @@ type StoreContextType = {
   cartItems: CartItem[];
   setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
 
+  placedOrder: any;
+  setPlacedOrder: React.Dispatch<React.SetStateAction<any>>;
+
   displayedProducts: Product[];
 
   mergedProducts: MergedProduct[];
@@ -47,6 +50,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
+  const [placedOrder, setPlacedOrder] = useState(null);
+
   useEffect(() => {
     const stored = localStorage.getItem("cart");
 
@@ -55,9 +60,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  //retrival from localstorage for placedOrder
+  useEffect(() => {
+    const stored = localStorage.getItem("placedorder");
+
+    if (stored) {
+      setPlacedOrder(JSON.parse(stored));
+    }
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
+
+  // setting of localstorage for palcedOrder
+
+  useEffect(() => {
+    if (placedOrder) {
+      localStorage.setItem("placedorder", JSON.stringify(placedOrder));
+    }
+  }, [placedOrder]);
 
   const [displayedProducts, setDisplayedProducts] = useState([]);
 
@@ -230,6 +252,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         incrementItem,
         decrementItem,
         addToCart,
+        placedOrder,
+        setPlacedOrder,
       }}
     >
       {children}
