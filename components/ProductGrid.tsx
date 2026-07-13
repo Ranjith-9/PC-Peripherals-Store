@@ -1,15 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
-import type { Product } from "@/types/product";
+import type { Product } from "@prisma/client";
 import Link from "next/link";
 import { useStore } from "@/providers/StoreProvider";
 
+interface productGridProps {
+  productData: Product[];
+  isAdmin?: boolean;
+}
+
 export default function ProductGrid({
   productData,
-}: {
-  productData: Product[];
-}) {
+  isAdmin = false,
+}: productGridProps) {
   const [product, setProduct] = useState<Product[]>(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -87,7 +91,7 @@ export default function ProductGrid({
             className="flex items-center justify-center"
             key={item.id ?? index}
           >
-            <ProductPanel productData={item} />
+            <ProductPanel productData={item} isAdmin={isAdmin} />
           </div>
         ))}
       </div>

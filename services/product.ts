@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import type { CreateAddressInput } from "@/types/input";
+import { Product } from "@prisma/client";
 
 export async function getProducts(
   cursor?: string,
@@ -9,12 +10,30 @@ export async function getProducts(
 ) {
   const product = await db.product.findMany({
     take: 10,
-    ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-    ...(category &&
-      category.length > 0 && { where: { category: { in: category } } }),
-    ...(search && {
-      where: { name: { contains: search, mode: "insensitive" } },
+
+    ...(cursor && {
+      cursor: { id: cursor },
+      skip: 1,
     }),
+
+    where: {
+      isActive: true,
+
+      ...(category &&
+        category.length > 0 && {
+          category: {
+            in: category,
+          },
+        }),
+
+      ...(search && {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      }),
+    },
+
     orderBy:
       sort === "price_asc"
         ? [{ price: "asc" }, { id: "desc" }]
@@ -89,4 +108,28 @@ export async function addAddress(userId: string, data: CreateAddressInput) {
   });
 }
 
-export async function deleteAddress() {}
+export async function addProducts(data: Product) {
+  return await db.product.create({
+    data,
+  });
+}
+
+export async function updateProduct(id: string, data: Product) {
+  return await db.product.update({
+    where: {
+      id,
+    },
+    data,
+  });
+}
+
+export async function deleteProduct(id: string) {
+  return await db.product.update({
+    where: {
+      id,
+    },
+    data: {
+      isActive: false,
+    },
+  });
+}

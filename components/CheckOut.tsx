@@ -2,7 +2,13 @@
 import { use, useEffect, useState } from "react";
 import type { Session } from "@/types/user";
 import { Address } from "@prisma/client/edge";
-import { ChevronDown, Plus, EllipsisVertical, Handbag } from "lucide-react";
+import {
+  ChevronDown,
+  Plus,
+  EllipsisVertical,
+  Handbag,
+  Loader2,
+} from "lucide-react";
 import AddressModal from "./AddressForm";
 import { signOut } from "next-auth/react";
 import { useStore } from "@/providers/StoreProvider";
@@ -17,6 +23,7 @@ interface CheckOutProps {
 
 export default function CheckOut({ session, addresses }: CheckOutProps) {
   const router = useRouter();
+
   const [address, setAddress] = useState<Address[]>(addresses);
   const [openSection, setOpenSection] = useState({
     addSection: false,
@@ -41,6 +48,8 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
   const { mergedProducts } = useStore();
   const { setCartItems } = useStore();
   const { setPlacedOrder } = useStore();
+
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const handleDelete = async (addressId: string) => {
     const response = await fetch(`/api/address/${addressId}`, {
@@ -95,6 +104,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
       order_id: order.id,
 
       handler: async function (response: any) {
+        setIsRedirecting(true);
         // Payment succeeded
         const verifyResponse = await fetch("/api/payment/verify", {
           method: "POST",
@@ -505,6 +515,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                       open={true}
                       onClose={() => {}}
                       header={false}
+                      savedAddress={address}
                       onAddressAdded={(newAddress) => {
                         setAddress((currentAddresses) => {
                           if (newAddress.isDefault) {
@@ -589,6 +600,16 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
           </div>
         </div>
       </div>
+
+      {/* {redirecting page} */}
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-10 w-10 animate-spin" />
+            <p className="text-lg font-medium">Preparing your order...</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }

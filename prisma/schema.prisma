@@ -14,9 +14,8 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-
-  address Address[]
-  orders  Order[]
+  address       Address[]
+  orders        Order[]
 }
 
 model Account {
@@ -48,6 +47,7 @@ model Product {
   createdAt   DateTime    @default(now())
   attributes  Json
   slug        String?     @unique
+  isActive    Boolean?    @default(true)
   orderItems  OrderItem[]
 }
 
@@ -64,6 +64,32 @@ model Address {
   postalCode   String
   isDefault    Boolean @default(false)
   user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              String         @id @default(cuid())
+  userId          String
+  status          OrderStatus    @default(PENDING)
+  paymentMethod   PaymentMethod
+  shippingMethod  ShippingMethod
+  totalAmount     Float
+  shippingAddress Json
+  billingAddress  Json
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  user            User           @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 enum OrderStatus {
@@ -83,42 +109,4 @@ enum PaymentMethod {
 enum ShippingMethod {
   STANDARD
   EXPRESS
-}
-
-model Order {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  status OrderStatus @default(PENDING)
-
-  paymentMethod  PaymentMethod
-  shippingMethod ShippingMethod
-
-  totalAmount Float
-
-  shippingAddress Json
-  billingAddress  Json
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items OrderItem[]
-}
-
-model OrderItem {
-  id String @id @default(cuid())
-
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id])
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  quantity Int
-
-  unitPrice Float
-
-  subtotal Float
 }

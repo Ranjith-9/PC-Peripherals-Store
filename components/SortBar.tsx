@@ -4,7 +4,7 @@ export default function SortBar() {
   const { filters, setFilters } = useStore();
 
   return (
-    <div>
+    <div className="text-black flex justify-end ">
       <span className="text-sm font-medium">Sort by: </span>
 
       <select

@@ -1,17 +1,38 @@
 "use client";
 import { useStore } from "@/providers/StoreProvider";
-import type { Product } from "@/types/product";
+import { Product } from "@prisma/client";
+import { useState } from "react";
 import Link from "next/link";
+import AddProductForm from "./AddProductForm";
 
 interface ProductPanelProps {
   productData: Product;
+  isAdmin: boolean;
 }
 
-export default function ProductPanel({ productData }: ProductPanelProps) {
+export default function ProductPanel({
+  productData,
+  isAdmin,
+}: ProductPanelProps) {
   const { addToCart } = useStore();
+  const { deleteProduct } = useStore();
+  const [flag, setFlag] = useState(false);
 
+  const handleSubmit = () => {};
   return (
     <div className="">
+      {flag && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-[900px] h-[700px] overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+            <AddProductForm
+              isEdit={true}
+              productDetails={productData}
+              onClose={() => setFlag(false)}
+            />
+          </div>
+        </div>
+      )}
+
       <div
         className="
         bg-gray-200
@@ -64,8 +85,10 @@ export default function ProductPanel({ productData }: ProductPanelProps) {
       transition-all duration-700
     "
           >
-            <button
-              className="
+            {isAdmin ? (
+              <div className="flex gap-2">
+                <button
+                  className="
         mt-4 w-full
         bg-black text-white
         py-2 rounded-xl
@@ -73,10 +96,43 @@ export default function ProductPanel({ productData }: ProductPanelProps) {
         transition-colors
         transition active:scale-95
       "
-              onClick={() => addToCart(productData)}
-            >
-              Add to Cart
-            </button>
+                  onClick={() => {
+                    setFlag(true);
+                  }}
+                >
+                  Update
+                </button>
+                <button
+                  className="
+        mt-4 w-full
+        bg-red-800 text-white
+        py-2 rounded-xl
+        hover:bg-red-500
+        transition-colors
+        transition active:scale-95
+      "
+                  onClick={() => {
+                    deleteProduct(productData.id);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            ) : (
+              <button
+                className="
+        mt-4 w-full
+        bg-black text-white
+        py-2 rounded-xl
+        hover:bg-gray-800
+        transition-colors
+        transition active:scale-95
+      "
+                onClick={() => addToCart(productData)}
+              >
+                Add to Cart
+              </button>
+            )}
           </div>
         </div>
       </div>

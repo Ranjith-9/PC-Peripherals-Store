@@ -7,14 +7,15 @@ export interface ProductAttributes {
 }
 
 export interface Product {
-  id: string;
   name: string;
+  id: string;
   description: string;
   price: number;
   imageUrl: string;
   category: string;
   stock: number;
-  attributes: ProductAttributes;
   createdAt: Date;
-  slug: string;
+  attributes: string | number | boolean | null;
+  slug: string | null;
+  isActive: boolean | null;
 }

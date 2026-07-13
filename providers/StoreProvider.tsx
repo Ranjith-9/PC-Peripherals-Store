@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import type { Filtertype } from "@/types/filter";
-import type { Product } from "@/types/product";
+import type { Product } from "@prisma/client";
 
 export type CartItem = {
   productId: string;
@@ -30,6 +30,8 @@ type StoreContextType = {
 
   mergedProducts: MergedProduct[];
 
+  deleteProduct: (productId: string) => Promise<void>;
+
   addToCart: (product: Product) => Promise<void>;
 
   incrementItem: (productId: string) => Promise<void>;
@@ -50,7 +52,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const [placedOrder, setPlacedOrder] = useState(null);
+  const [placedOrder, setPlacedOrder] = useState();
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
@@ -238,6 +240,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteProduct = async (productId: string) => {
+    console.log("checking id from deleteproduct", productId);
+    const res = await fetch("/api/product/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: productId }),
+    });
+
+    const result = await res.json();
+
+    console.log("error message", result);
+
+    alert("product deleted sucessfully");
+  };
+
   return (
     <StoreContext.Provider
       value={{
@@ -254,6 +271,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         placedOrder,
         setPlacedOrder,
+        deleteProduct,
       }}
     >
       {children}

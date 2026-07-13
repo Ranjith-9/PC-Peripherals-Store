@@ -1,25 +1,20 @@
 "use client";
-import { useState } from "react";
-//Components
+
 import ProductGrid from "@/components/ProductGrid";
 import SideBar from "@/components/SideBar";
 import SortBar from "./SortBar";
-import { useStore } from "@/providers/StoreProvider";
 
-//Types
 import type { Product } from "@prisma/client";
 
-interface HomeViewProps {
+interface updateProductsProps {
   initialProducts: Product[];
   categories: string[];
 }
 
-export interface CartItem {
-  productId: string;
-  quantity: number;
-}
-
-export default function Home({ initialProducts, categories }: HomeViewProps) {
+export default function UpdateProducts({
+  categories,
+  initialProducts,
+}: updateProductsProps) {
   return (
     <div>
       <div className="h-screen flex bg-gray-100">
@@ -28,14 +23,14 @@ export default function Home({ initialProducts, categories }: HomeViewProps) {
           <SideBar categories={categories} />
         </div>
         {/*Main content*/}
-        <div className="flex-1 bg-green-500">
+        <div className="flex-1 bg-black-500">
           {/* Sort bar */}
-          <div className="h-7 bg-pink-300">
+          <div className="h-7 bg-cyan-300">
             <SortBar />
           </div>
           {/* Product grid */}
           <div className="p-4">
-            <ProductGrid productData={initialProducts} />
+            <ProductGrid productData={initialProducts} isAdmin={true} />
           </div>
         </div>
       </div>

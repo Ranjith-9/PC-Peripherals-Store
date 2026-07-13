@@ -84,10 +84,14 @@ export default function orderPage() {
     return (
       <>
         <div className="h-screen flex justify-center items-center overflow-hidden">
-          <div className=" w-[1000px] h-[90%] text-black p-10 shadow-2xl rounded-3xl">
-            <div className="D1 h-[40%] flex flex-col">
+          <div className=" w-[1000px] h-[90%] text-black  shadow-2xl rounded-3xl bg-gradient-to-br from-white via-green-50 to-white">
+            <div className="D1 h-[40%] flex flex-col border  rounded-xl shadow-xl border-gray-300">
               <div className="f1 flex flex-col items-center mt-10">
-                <CircleCheck size={80} color="green" />
+                <div className="absolute w-36 h-36 rounded-full bg-green-300/30  blur-3xl" />
+                <div className="relative w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center ">
+                  <CircleCheck className="text-green-600 w-17 h-17" />
+                </div>
+
                 <h1>Payment Successful</h1>
               </div>
               <div className="f2 flex flex-col items-center mt-10">
@@ -103,7 +107,7 @@ export default function orderPage() {
                 WORK IN PROGRESS FOR TRACK
               </div>
             </div>
-            <div className="D2 flex h-[60%]">
+            <div className="D2 flex h-[60%] p-10 bg-white">
               <div className="d1 w-[70%] p-5 mt-2 ">
                 <div className="rounded-xl  w-full shadow-2xl  overflow-hidden">
                   <div className="k1 font-bold text-xl border-b p-5 bg-gray-300">
@@ -137,22 +141,28 @@ export default function orderPage() {
                           </div>
                         </div>
                       ))}
-                      <div className=" flex justify-between p-5">
-                        <div className="flex flex-col mt-2">
-                          <span>Subtotal</span>
-                          <span>Shipping</span>
-                          <span>Tax</span>
-                          <span>Total</span>
-                        </div>
-                        <div className="mt-2">
-                          <div>{placedOrder.totalAmount}</div>
-                          <div>Free</div>
-                          <div>
-                            {(placedOrder.totalAmount * 0.1).toFixed(2)}
+                      <div className="flex flex-col">
+                        {" "}
+                        <div className=" flex justify-between p-5">
+                          <div className="flex flex-col mt-2">
+                            <span>Subtotal</span>
+                            <span>Shipping</span>
+                            <span>Tax</span>
                           </div>
+                          <div className="mt-2">
+                            <div>{placedOrder.totalAmount}</div>
+                            <div>Free</div>
+                            <div>
+                              {(placedOrder.totalAmount * 0.1).toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-between p-5 bg-green-100">
+                          {" "}
+                          <span>Total</span>{" "}
                           <div>
                             {(placedOrder.totalAmount * 1.1).toFixed(2)}
-                          </div>
+                          </div>{" "}
                         </div>
                       </div>
                     </>
@@ -179,7 +189,7 @@ export default function orderPage() {
                   <div className="pb-3">{placedOrder.paymentMethod}</div>
                 </div>
                 <div className="g3 mt-6">
-                  <button className="flex justify-center items-center bg-gray-700 w-full rounded-md h-12 text-white font-bold shadow-xl">
+                  <button className="flex justify-center items-center bg-green-700 w-full rounded-md h-12 text-white font-bold shadow-xl">
                     <span className="mr-2">Track your order</span>
                     <ChevronRight size={18} />
                   </button>
