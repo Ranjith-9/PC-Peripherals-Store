@@ -8,17 +8,20 @@ import AddProductForm from "./AddProductForm";
 interface ProductPanelProps {
   productData: Product;
   isAdmin: boolean;
+  onUpdate?: any;
+  onDelete?: any;
 }
 
 export default function ProductPanel({
   productData,
   isAdmin,
+  onUpdate,
+  onDelete,
 }: ProductPanelProps) {
   const { addToCart } = useStore();
   const { deleteProduct } = useStore();
   const [flag, setFlag] = useState(false);
 
-  const handleSubmit = () => {};
   return (
     <div className="">
       {flag && (
@@ -28,6 +31,7 @@ export default function ProductPanel({
               isEdit={true}
               productDetails={productData}
               onClose={() => setFlag(false)}
+              onUpdate={onUpdate}
             />
           </div>
         </div>
@@ -103,16 +107,10 @@ export default function ProductPanel({
                   Update
                 </button>
                 <button
-                  className="
-        mt-4 w-full
-        bg-red-800 text-white
-        py-2 rounded-xl
-        hover:bg-red-500
-        transition-colors
-        transition active:scale-95
-      "
+                  className="mt-4 w-full bg-red-800 text-white py-2 rounded-xl hover:bg-red-500 transition-colors transition active:scale-95"
                   onClick={() => {
                     deleteProduct(productData.id);
+                    onDelete(productData.id);
                   }}
                 >
                   Delete
@@ -120,14 +118,7 @@ export default function ProductPanel({
               </div>
             ) : (
               <button
-                className="
-        mt-4 w-full
-        bg-black text-white
-        py-2 rounded-xl
-        hover:bg-gray-800
-        transition-colors
-        transition active:scale-95
-      "
+                className="mt-4 w-full bg-black text-white py-2 rounded-xl hover:bg-gray-800 transition-colors transition active:scale-95"
                 onClick={() => addToCart(productData)}
               >
                 Add to Cart

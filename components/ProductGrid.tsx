@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import ProductPanel from "./ProductPanel";
 import type { Product } from "@prisma/client";
-import Link from "next/link";
 import { useStore } from "@/providers/StoreProvider";
 
 interface productGridProps {
@@ -19,7 +18,20 @@ export default function ProductGrid({
   const [hasMore, setHasMore] = useState(true);
   const { filters, setFilters } = useStore();
 
+  //callback function to update products when edited or deleted
+
+  const handleProductUpdate = (updatedProduct: any) => {
+    setProduct((prev) =>
+      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
+    );
+  };
+
+  const handleProductDelete = (productId: any) => {
+    setProduct((prev) => prev.filter((p) => p.id !== productId));
+  };
+
   useEffect(() => {
+    console.log("fetchProductsByCategory called");
     fetchProductsByCategory();
   }, [filters]);
 
@@ -91,12 +103,21 @@ export default function ProductGrid({
             className="flex items-center justify-center"
             key={item.id ?? index}
           >
-            <ProductPanel productData={item} isAdmin={isAdmin} />
+            <ProductPanel
+              productData={item}
+              isAdmin={isAdmin}
+              onUpdate={handleProductUpdate}
+              onDelete={handleProductDelete}
+            />
           </div>
         ))}
       </div>
-      <div>
-        <button onClick={loadMore} disabled={loading || !hasMore}>
+      <div className="m">
+        <button
+          onClick={loadMore}
+          disabled={loading || !hasMore}
+          className="bg-black text-white px-7 py-4 rounded-md shadow-md ml-5 mt-5"
+        >
           {loading ? "Loading..." : "Load more"}
         </button>
       </div>

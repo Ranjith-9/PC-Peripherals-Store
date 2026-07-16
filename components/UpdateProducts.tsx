@@ -18,10 +18,6 @@ export default function UpdateProducts({
   return (
     <div>
       <div className="h-screen flex bg-gray-100">
-        {/*Side bar*/}
-        <div className="w-80 bg-gray-300">
-          <SideBar categories={categories} />
-        </div>
         {/*Main content*/}
         <div className="flex-1 bg-black-500">
           {/* Sort bar */}
@@ -32,6 +28,10 @@ export default function UpdateProducts({
           <div className="p-4">
             <ProductGrid productData={initialProducts} isAdmin={true} />
           </div>
+        </div>
+        {/*Side bar*/}
+        <div className="w-50 bg-gray-300">
+          <SideBar categories={categories} />
         </div>
       </div>
     </div>

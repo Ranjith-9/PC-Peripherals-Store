@@ -9,11 +9,13 @@ import Link from "next/link";
 
 interface NavBarProps {
   session: Session | null;
+  isAdmin?: boolean;
 }
 
-export default function NavBar({ session }: NavBarProps) {
+export default function NavBar({ session, isAdmin = false }: NavBarProps) {
   const { cartOpen, setCartOpen } = useStore();
   const { cartItems } = useStore();
+  const { searchBarOpen } = useStore();
 
   return (
     <nav className="bg-gray-800 p-4">
@@ -23,7 +25,7 @@ export default function NavBar({ session }: NavBarProps) {
           <div>Gaming Store XYZ</div>
         </Link>
         {/* Middle */}
-        <SearchBar />
+        {searchBarOpen && <SearchBar />}
         {/* Right */}
         <div className="flex items-center space-x-4">
           <div>
@@ -36,12 +38,16 @@ export default function NavBar({ session }: NavBarProps) {
             )}
           </div>
           <LoginButton session={session} />
-          <ShoppingCart
-            className="text-white cursor-pointer"
-            size={35}
-            onClick={() => setCartOpen(!cartOpen)}
-          />
-          <span>{cartItems.length}</span>
+          {!isAdmin && (
+            <>
+              <ShoppingCart
+                className="text-white cursor-pointer"
+                size={35}
+                onClick={() => setCartOpen(!cartOpen)}
+              />
+              <span>{cartItems.length}</span>
+            </>
+          )}
         </div>
       </div>
     </nav>

@@ -7,13 +7,15 @@ import { Product } from "@prisma/client";
 interface ProductFormProps {
   isEdit?: boolean;
   productDetails?: Product;
-  onClose: () => void;
+  onClose?: () => void;
+  onUpdate?: any;
 }
 
 export default function AddProductForm({
   isEdit = true,
   productDetails,
   onClose,
+  onUpdate,
 }: ProductFormProps) {
   type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
   const [attributes, setAttributes] = useState([{ key: "", value: "" }]);
@@ -97,6 +99,7 @@ export default function AddProductForm({
 
   // function to update product
   const handleUpdate = async (e: any) => {
+    e.preventDefault();
     const attributesJson = Object.fromEntries(
       attributes
         .filter((attr) => attr.key.trim() !== "")
@@ -114,16 +117,17 @@ export default function AddProductForm({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedForm),
+      body: JSON.stringify({ data: updatedForm, id: productDetails?.id }),
     });
 
-    const result = response.json();
+    const result = await response.json();
 
     if (!response.ok) {
       console.error(result);
       return;
     }
-
+    onUpdate(result);
+    if (onClose) onClose();
     alert("Product updated successfully");
   };
 

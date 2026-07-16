@@ -6,7 +6,7 @@ export default async function admin() {
   const productFromDatabase: Product[] = await getProducts();
   const productCategory: string[] = await getCategory();
   return (
-    <div className="bg-gray-700 h-screen">
+    <div className="bg-gray-700">
       <AdminDashboard
         initialProducts={productFromDatabase}
         categories={productCategory}

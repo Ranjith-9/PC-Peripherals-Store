@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { db } from "@/lib/db";
 
 export async function setOrders(
   tx: Prisma.TransactionClient,
@@ -44,4 +45,16 @@ export async function decrementStock(
       },
     });
   }
+}
+
+export async function getOrders() {
+  return await db.order.findMany({
+    include: {
+      items: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
 }

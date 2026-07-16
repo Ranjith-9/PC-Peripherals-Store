@@ -3,7 +3,6 @@ import "../globals.css";
 import NavBar from "@/components/NavBar";
 import { getServerSession } from "next-auth/next";
 import type { Session } from "@/types/user";
-import CartView from "@/components/CartView";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,8 +18,7 @@ export default async function RootLayout({
 
   return (
     <>
-      <NavBar session={session} />
-      <CartView />
+      <NavBar session={session} isAdmin={true} />
       {children}
     </>
   );

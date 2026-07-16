@@ -20,6 +20,9 @@ type StoreContextType = {
   cartOpen: boolean;
   setCartOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
+  searchBarOpen: boolean;
+  setSearchBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
   cartItems: CartItem[];
   setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
 
@@ -49,6 +52,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   });
 
   const [cartOpen, setCartOpen] = useState(false);
+
+  const [searchBarOpen, setSearchBarOpen] = useState(true);
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
@@ -241,7 +246,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteProduct = async (productId: string) => {
-    console.log("checking id from deleteproduct", productId);
     const res = await fetch("/api/product/delete", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -272,6 +276,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         placedOrder,
         setPlacedOrder,
         deleteProduct,
+        searchBarOpen,
+        setSearchBarOpen,
       }}
     >
       {children}
