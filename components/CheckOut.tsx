@@ -33,7 +33,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
   const shippingModes = ["STANDARD", "EXPRESS"];
   const paymentMethods = ["PAYPAL", "CARD", "CASH_ON_DELIVERY"];
   const [selectAddress, setSelectAddress] = useState<Address | null>(
-    address.find((addr) => addr.isDefault) ?? address[0] ?? null,
+    address.find((addr) => addr.isDefault) ?? address[0] ?? null
   );
   const [differentAddress, setDifferentAddress] = useState();
   const [isShippingOpen, setIsShippingOpen] = useState(false);
@@ -64,7 +64,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
     }
 
     const remainingAddresses = address.filter(
-      (currentAddress) => currentAddress.id !== addressId,
+      (currentAddress) => currentAddress.id !== addressId
     );
 
     setAddress(remainingAddresses);
@@ -86,14 +86,15 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
 
   useEffect(() => {
     setSelectAddress(
-      address.find((addr) => addr.isDefault) ?? address[0] ?? null,
+      address.find((addr) => addr.isDefault) ?? address[0] ?? null
     );
   }, [address]);
 
   function openRazorpay(
     order: razerPayOrder,
-    checkoutData: CreateOrderRequest,
+    checkoutData: CreateOrderRequest
   ) {
+    console.log("openrazorpay running");
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
 
@@ -147,7 +148,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
       billingAddress: shippingAddressSelected,
       totalAmount: mergedProducts.reduce(
         (acc: number, product: any) => acc + product.price * product.quantity,
-        0,
+        0
       ),
       cartItems: mergedProducts.map((product) => ({
         productId: product.id,
@@ -259,7 +260,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                 setAddress((currentAddresses) => {
                                   if (newAddress.isDefault) {
                                     currentAddresses.map(
-                                      (address) => (address.isDefault = false),
+                                      (address) => (address.isDefault = false)
                                     );
                                   }
 
@@ -341,8 +342,8 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                             prev.map((addr) =>
                                               addr.id === address.id
                                                 ? { ...addr, isDefault: true }
-                                                : { ...addr, isDefault: false },
-                                            ),
+                                                : { ...addr, isDefault: false }
+                                            )
                                           )
                                         }
                                       >
@@ -410,10 +411,10 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                                 if (newAddress.isDefault) {
                                   console.log(
                                     "newAddress.isDefault",
-                                    newAddress.isDefault,
+                                    newAddress.isDefault
                                   );
                                   currentAddresses.map(
-                                    (address) => (address.isDefault = false),
+                                    (address) => (address.isDefault = false)
                                   );
                                 }
 
@@ -521,10 +522,10 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                           if (newAddress.isDefault) {
                             console.log(
                               "newAddress.isDefault",
-                              newAddress.isDefault,
+                              newAddress.isDefault
                             );
                             currentAddresses.map(
-                              (address) => (address.isDefault = false),
+                              (address) => (address.isDefault = false)
                             );
                           }
 
@@ -592,7 +593,7 @@ export default function CheckOut({ session, addresses }: CheckOutProps) {
                   .reduce(
                     (acc: number, product: any) =>
                       acc + product.price * product.quantity,
-                    0,
+                    0
                   )
                   .toFixed(2)}
               </div>

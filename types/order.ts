@@ -1,3 +1,5 @@
+import { OrderStatus, PaymentMethod, ShippingMethod } from "@prisma/client";
+
 export interface order {
   id: number;
   productId: number;
@@ -51,4 +53,68 @@ export interface CartItem {
   quantity: number;
   price: number;
   subtotal: number;
+}
+
+export interface Orders {
+  id: string;
+  userId: string;
+  status: OrderStatus;
+  originalStatus: OrderStatus;
+  paymentMethod: PaymentMethod;
+  shippingMethod: ShippingMethod;
+  totalAmount: number;
+
+  shippingAddress: {
+    id: string;
+    city: string;
+    phone: string;
+    state: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    isDefault: boolean;
+    postalCode: string;
+    addressLine1: string;
+    addressLine2: string;
+  };
+
+  billingAddress: {
+    id: string;
+    city: string;
+    phone: string;
+    state: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    isDefault: boolean;
+    postalCode: string;
+    addressLine1: string;
+    addressLine2: string;
+  };
+
+  createdAt: string;
+  updatedAt: string;
+
+  items: {
+    id: string;
+    orderId: string;
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+
+    product: {
+      id: string;
+      name: string;
+      description: string;
+      price: number;
+      imageUrl: string;
+      category: string;
+      stock: number;
+      createdAt: string;
+      attributes: Record<string, string | number | boolean>;
+      slug: string;
+      isActive: boolean;
+    };
+  }[];
 }

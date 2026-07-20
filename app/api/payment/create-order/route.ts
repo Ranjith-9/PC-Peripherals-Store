@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   const products = await checkProducts(productIds);
 
   const productMap = new Map(
-    products.map((product: any) => [product.id, product]),
+    products.map((product: any) => [product.id, product])
   );
 
   for (const item of data.cartItems) {
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (!product) {
       return NextResponse.json(
         { error: "product doesnt exist" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -39,14 +39,14 @@ export async function POST(req: NextRequest) {
     if (product.stock < item.quantity) {
       return NextResponse.json(
         { error: "product out of stock" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (subTotalClient !== subTotalServer) {
       return NextResponse.json(
         { error: "Product price mismatch" },
-        { status: 400 },
+        { status: 400 }
       );
     }
   }
@@ -58,6 +58,8 @@ export async function POST(req: NextRequest) {
   };
 
   const order = await razorpay.orders.create(options);
+
+  console.log("order from backend", order);
 
   return NextResponse.json(order);
 }

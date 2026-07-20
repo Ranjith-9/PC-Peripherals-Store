@@ -17,7 +17,7 @@ export default function AdminDashboard({
   categories,
 }: AdminDashboardProps) {
   const [activePage, setActivePage] = useState<"add" | "modify" | "orders">(
-    "orders",
+    "orders"
   );
 
   const { setSearchBarOpen } = useStore();
@@ -29,20 +29,6 @@ export default function AdminDashboard({
       setSearchBarOpen(false);
     }
   }, [activePage]);
-
-  // useEffect(() => {
-  //   async function getOrders() {
-  //     const res = await fetch("/api/order", {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const result = await res.json();
-  //     console.log("result from useEffect", result);
-  //   }
-  //   getOrders();
-  // }, []);
 
   return (
     <div className="flex min-h-screen">

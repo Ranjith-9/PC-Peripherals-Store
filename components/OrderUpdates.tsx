@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { OrderStatus as OrderStatuses } from "@prisma/client";
+import type { Orders } from "@/types/order";
 
 export default function OrderUpdates() {
-  const [orders, setOrders] = useState();
+  const [orders, setOrders] = useState<Orders[]>([]);
 
   const [expandedOrders, setExpandedOrders] = useState(new Set<string>());
 
@@ -22,7 +23,7 @@ export default function OrderUpdates() {
   };
 
   const [changedOrders, setChangedOrders] = useState(
-    new Map<string, OrderStatuses>(),
+    new Map<string, OrderStatuses>()
   );
 
   // fetch orders
@@ -37,7 +38,7 @@ export default function OrderUpdates() {
 
       const result = await res.json();
 
-      const editableOrders = result.map((order) => ({
+      const editableOrders = result.map((order: Orders) => ({
         ...order,
         status: order.status as OrderStatuses,
         originalStatus: order.status as OrderStatuses,
@@ -51,15 +52,15 @@ export default function OrderUpdates() {
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatuses) => {
     // Find current order BEFORE updating state
-    const currentOrder = orders.find((o) => o.id === orderId);
+    const currentOrder = orders ? orders.find((o) => o.id === orderId) : null;
 
     if (!currentOrder) return;
 
     // Update UI immediately
     setOrders((prev) =>
       prev.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order,
-      ),
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
     );
 
     // Update changed orders
@@ -104,8 +105,8 @@ export default function OrderUpdates() {
               ...order,
               originalStatus: order.status,
             }
-          : order,
-      ),
+          : order
+      )
     );
 
     setChangedOrders(new Map());
@@ -120,7 +121,7 @@ export default function OrderUpdates() {
           orders.map((order) => (
             <div key={order.id}>
               <div
-                className="flex items-center gap-5 border p-2"
+                className={`flex items-center gap-5 p-2 bg-gray-100 text-black rounded-md ${expandedOrders.has(order.id) ? "rounded-b-none" : ""}`}
                 onClick={() => {
                   toggleOrder(order.id);
                 }}
@@ -132,7 +133,7 @@ export default function OrderUpdates() {
                   onChange={(e) =>
                     handleStatusChange(
                       order.id,
-                      e.target.value as OrderStatuses,
+                      e.target.value as OrderStatuses
                     )
                   }
                 >
@@ -150,18 +151,23 @@ export default function OrderUpdates() {
                 </div>
               </div>
               <div>
-                {!expandedOrders.has(order.id) || (
-                  <div>
-                    {order.items.map((item) => (
-                      <div key={item.id} className="flex gap-5">
-                        <div>{item.product.name}</div>
-                        <div>{item.quantity}</div>
-                        <div>{item.subtotal}</div>
-                      </div>
-                    ))}
-                    <div>Total : {order.totalAmount}</div>
-                  </div>
-                )}
+                <div
+                  className={`px-5 overflow-hidden transition-all duration-300 ease-in-out bg-gray-300 text-black rounded-b-md ${
+                    expandedOrders.has(order.id)
+                      ? "py-2 max-h-96 opacity-100"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {order.items.map((item) => (
+                    <div key={item.id} className="flex gap-5">
+                      <div>{item.product.name}</div>
+                      <div>{item.quantity}</div>
+                      <div>{item.subtotal}</div>
+                    </div>
+                  ))}
+
+                  <div>Total : {order.totalAmount}</div>
+                </div>
               </div>
             </div>
           ))}

@@ -14,6 +14,10 @@ export default function SideBar({ categories }: SideBarProps) {
       title: "Categories",
       options: categories,
     },
+    {
+      title: "comp",
+      options: ["item1", "item2"],
+    },
   ];
 
   const [openSection, setOpenSection]: any = useState({});

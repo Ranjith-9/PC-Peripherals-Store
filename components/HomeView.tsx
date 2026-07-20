@@ -6,6 +6,8 @@ import SideBar from "@/components/SideBar";
 import SortBar from "./SortBar";
 import { useStore } from "@/providers/StoreProvider";
 
+import CategoryBar from "@/components/CategoryBar";
+
 //Types
 import type { Product } from "@prisma/client";
 
@@ -22,6 +24,9 @@ export interface CartItem {
 export default function Home({ initialProducts, categories }: HomeViewProps) {
   return (
     <div>
+      <div className="flex ml-[20rem]">
+        <CategoryBar categories={categories} />
+      </div>
       <div className="h-screen flex bg-gray-100">
         {/*Side bar*/}
         <div className="w-80 bg-gray-300">
