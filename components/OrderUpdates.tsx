@@ -23,7 +23,7 @@ export default function OrderUpdates() {
   };
 
   const [changedOrders, setChangedOrders] = useState(
-    new Map<string, OrderStatuses>()
+    new Map<string, OrderStatuses>(),
   );
 
   // fetch orders
@@ -59,8 +59,8 @@ export default function OrderUpdates() {
     // Update UI immediately
     setOrders((prev) =>
       prev.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
+        order.id === orderId ? { ...order, status: newStatus } : order,
+      ),
     );
 
     // Update changed orders
@@ -105,8 +105,8 @@ export default function OrderUpdates() {
               ...order,
               originalStatus: order.status,
             }
-          : order
-      )
+          : order,
+      ),
     );
 
     setChangedOrders(new Map());
@@ -133,7 +133,7 @@ export default function OrderUpdates() {
                   onChange={(e) =>
                     handleStatusChange(
                       order.id,
-                      e.target.value as OrderStatuses
+                      e.target.value as OrderStatuses,
                     )
                   }
                 >

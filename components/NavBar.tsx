@@ -13,9 +13,7 @@ interface NavBarProps {
 }
 
 export default function NavBar({ session, isAdmin = false }: NavBarProps) {
-  const { cartOpen, setCartOpen } = useStore();
-  const { cartItems } = useStore();
-  const { searchBarOpen } = useStore();
+  const { cartOpen, setCartOpen, cartItems, searchBarOpen } = useStore();
 
   return (
     <nav className="bg-gray-800 p-4">

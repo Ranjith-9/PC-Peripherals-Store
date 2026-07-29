@@ -1,8 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProductByIds } from "@/services/product";
+import { CartProductsSchema } from "@/zodSchema/product";
+import { z } from "zod";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { rateLimiters } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
-  const { ids } = await req.json();
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown";
+
+  // Rate limiting
+  const { success } = await rateLimiters.products.limit(ip);
+
+  if (!success) {
+    return Response.json(
+      { message: "Too many payment attempts" },
+      { status: 429 },
+    );
+  }
+  const body = await req.json();
+
+  const result = CartProductsSchema.safeParse(body);
+
+  if (!result.success) {
+    return Response.json(
+      { errors: z.treeifyError(result.error) },
+      { status: 400 },
+    );
+  }
+
+  const { ids } = result.data;
 
   if (!ids || !Array.isArray(ids)) {
     return NextResponse.json(

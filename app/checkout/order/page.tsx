@@ -13,49 +13,6 @@ export default function orderPage() {
 
   const [orderItems, setOrderItems] = useState<any[]>([]);
 
-  const placeHolder = {
-    status: "pending",
-    paymentMethod: "PAYPAL",
-    shippingMethod: "STANDARD",
-    shippingAddress: {
-      id: "cmr0qn7750008buxvu415ik9b",
-      userId: "cmpguj5jp0000sy2e80kmj3x1",
-      firstName: "Ranjith",
-      lastName: "Ramesh",
-      phone: "08870596277",
-      addressLine1: "9Z SIS Meridian , 100 Ft Road , Velachery SIS Meridian",
-      addressLine2: "",
-      city: "Chennai",
-      state: "Tamil Nadu",
-      postalCode: "600042",
-      isDefault: false,
-    },
-    billingAddress: {
-      id: "cmr0qn7750008buxvu415ik9b",
-      userId: "cmpguj5jp0000sy2e80kmj3x1",
-      firstName: "Ranjith",
-      lastName: "Ramesh",
-      phone: "08870596277",
-      addressLine1: "9Z SIS Meridian , 100 Ft Road , Velachery SIS Meridian",
-      addressLine2: "",
-      city: "Chennai",
-      state: "Tamil Nadu",
-      postalCode: "600042",
-      isDefault: false,
-    },
-    totalAmount: 179.99,
-    cartItems: [
-      {
-        productId: "cmp6kb9gk000zaibdunh3pc1k",
-        quantity: 1,
-        price: 179.99,
-        subtotal: 179.99,
-        imageUrl:
-          "https://images.unsplash.com/photo-1587033411391-5d9e51cce126?q=80&w=1200&auto=format&fit=crop",
-      },
-    ],
-  };
-
   useEffect(() => {
     if (!placedOrder) return;
 
@@ -83,9 +40,9 @@ export default function orderPage() {
   if (placedOrder) {
     return (
       <>
-        <div className="h-screen flex justify-center items-center overflow-hidden">
-          <div className=" w-[1000px] h-[90%] text-black  shadow-2xl rounded-3xl bg-gradient-to-br from-white via-green-50 to-white">
-            <div className="D1 h-[40%] flex flex-col border  rounded-xl shadow-xl border-gray-300">
+        <div className="h-screen flex justify-center items-center overflow-hidden rounded-3xl">
+          <div className=" w-[1000px] text-black shadow-2xl rounded-3xl bg-gradient-to-br from-white via-green-50 to-white">
+            <div className="D1 h-[40%] flex flex-col border  rounded-t-xl shadow-xl border-gray-300">
               <div className="f1 flex flex-col items-center mt-10">
                 <div className="absolute w-36 h-36 rounded-full bg-green-300/30  blur-3xl" />
                 <div className="relative w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center ">
@@ -107,7 +64,7 @@ export default function orderPage() {
                 WORK IN PROGRESS FOR TRACK
               </div>
             </div>
-            <div className="D2 flex h-[60%] p-10 bg-white">
+            <div className="D2 flex h-[60%] p-10 bg-white overflow-hidden rounded-b-xl">
               <div className="d1 w-[70%] p-5 mt-2 ">
                 <div className="rounded-xl  w-full shadow-2xl  overflow-hidden">
                   <div className="k1 font-bold text-xl border-b p-5 bg-gray-300">

@@ -6,35 +6,54 @@ interface categoriesProp {
 }
 
 export default function CategoryBar({ categories }: categoriesProp) {
-  const placeHolder = {
-    categories: [
-      "Gaming",
-      "Streaming",
-      "Components",
-      "PC Builds",
-      "Monitors",
-      "Custom PC quotes",
-      "Our Stores",
-    ],
-  };
+  const [hover, setHover] = useState<number | null>(null);
+  const placeHolder = [
+    {
+      name: "Gaming",
+      subcategories: ["Mouse", "Keyboard", "Headset"],
+    },
+    {
+      name: "Components",
+      subcategories: ["GPU", "CPU", "TPU"],
+    },
+    {
+      name: "Streaming",
+      subcategories: ["Microphone", "Camera", "Capture Card"],
+    },
+  ];
 
-  const subCat = new Map<string, string[]>([
-    ["Gaming", ["Mouse", "Keyboard", "Pads"]],
-    ["Streaming", ["MIC", "Camera"]],
-    ["Components", ["GPU", "Motherboard", "CPU"]],
-    ["PC Builds", ["Gaming PCs", "Video Editing PCs", "Streaming PCs"]],
-  ]);
+  // const subCat = new Map<string, string[]>([
+  //   ["Gaming", ["Mouse", "Keyboard", "Pads"]],
+  //   ["Streaming", ["MIC", "Camera"]],
+  //   ["Components", ["GPU", "Motherboard", "CPU"]],
+  //   ["PC Builds", ["Gaming PCs", "Video Editing PCs", "Streaming PCs"]],
+  // ]);
 
-  const cat = subCat.entries();
   return (
-    <div>
-      <div className="flex text-black gap-5">
-        {[...cat].map((item: any) => (
-          <div key={item}>
-            {item[0]}
-            {item[1].map((item) => {
-              return <div key={item}> {item} </div>;
-            })}
+    <div className="w-full bg-white">
+      <div className="ml-[18rem] relative flex text-black gap-20 h-12 text-[18px] font-bold font-mono">
+        {placeHolder.map((cat, index) => (
+          <div
+            key={cat.name}
+            className="flex items-center"
+            onMouseEnter={() => setHover(index)}
+            onMouseLeave={() => setHover(null)}
+          >
+            {cat.name}
+            {hover == index && (
+              <div className="absolute w-190 border bg-gray-300 shadow-lg z-1 left-0 top-12">
+                {" "}
+                {cat.subcategories.map((sub) => (
+                  <div
+                    key={sub}
+                    className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                  >
+                    {" "}
+                    {sub}{" "}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

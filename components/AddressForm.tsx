@@ -65,7 +65,7 @@ export default function AddressModal({
     const result = await response.json();
 
     if (!response.ok) {
-      console.error(result.message);
+      console.log(result.message);
       return;
     }
 
@@ -192,6 +192,11 @@ export default function AddressModal({
           onChange={handleChange}
           className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
         />
+        {form.phone.length > 10 && (
+          <p className="text-red-500 text-sm">
+            Phone number must be exactly 10 digits.
+          </p>
+        )}
 
         {/* City State Pin */}
 

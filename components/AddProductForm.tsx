@@ -79,6 +79,8 @@ export default function AddProductForm({
         strict: true,
       })}-${id}`,
     };
+
+    console.log("type of ", JSON.stringify(updatedForm, null, 2));
     const response = await fetch("/api/product/add", {
       method: "POST",
       headers: {

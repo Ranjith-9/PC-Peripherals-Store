@@ -1,38 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkProductStock } from "@/services/product";
+import { IncreaseItemZod } from "@/zodSchema/order";
+import { rateLimiters } from "@/lib/rateLimiter";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+// need to authenticate the user before allowed to make changes to the stock
 
 export async function PATCH(req: Request) {
-  const { productId, currentQuantity } = await req.json();
-  if (!productId) {
-    return new Response(JSON.stringify({ error: "Product ID is required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown";
+
+  // Rate limiting
+  const { success } = await rateLimiters.products.limit(ip);
+
+  if (!success) {
+    return Response.json(
+      { message: "Too many payment attempts" },
+      { status: 429 },
+    );
   }
+
+  // 3. Parse body once
+  const body = await req.json();
+
+  // 4. Validate
+  const result = IncreaseItemZod.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json(
+      { errors: result.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  const { productId, currentQuantity } = result.data;
+
+  // 5. General logic
   try {
-    const res = await checkProductStock(productId);
-    console.log("result from the backend", res);
-    console.log("res from backend", res);
-    if (res === null) {
-      return new Response(JSON.stringify({ error: "Product not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    } else if (res <= currentQuantity) {
-      return new Response(
-        JSON.stringify({ error: "Not enough stock available" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+    const stock = await checkProductStock(productId);
+
+    if (stock === null) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    if (stock <= currentQuantity) {
+      return NextResponse.json(
+        { error: "Not enough stock available" },
+        { status: 400 },
       );
     }
+
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Failed to increment cart item", error);
-    return new Response(JSON.stringify({ error: "Failed to increment item" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+  } catch (err) {
+    console.error(err);
+
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

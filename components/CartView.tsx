@@ -4,8 +4,13 @@ import Link from "next/link";
 
 export default function CartView() {
   // ONLY fetched product info
-  const { mergedProducts, incrementItem, decrementItem } = useStore();
-  const { cartOpen, setCartOpen } = useStore();
+  const {
+    mergedProducts,
+    incrementItem,
+    decrementItem,
+    cartOpen,
+    setCartOpen,
+  } = useStore();
 
   return (
     <>

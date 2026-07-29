@@ -1,13 +1,11 @@
 "use client";
-import { useState } from "react";
+
 //Components
 import ProductGrid from "@/components/ProductGrid";
 import SideBar from "@/components/SideBar";
 import SortBar from "./SortBar";
-import { useStore } from "@/providers/StoreProvider";
-
 import CategoryBar from "@/components/CategoryBar";
-
+import { useState } from "react";
 //Types
 import type { Product } from "@prisma/client";
 
@@ -22,20 +20,34 @@ export interface CartItem {
 }
 
 export default function Home({ initialProducts, categories }: HomeViewProps) {
+  const [sidebarOpen, setSideBarOpen] = useState(true);
   return (
-    <div>
-      <div className="flex ml-[20rem]">
+    <div className="">
+      <div className="flex py-3 bg-slate-300">
         <CategoryBar categories={categories} />
       </div>
       <div className="h-screen flex bg-gray-100">
         {/*Side bar*/}
-        <div className="w-80 bg-gray-300">
-          <SideBar categories={categories} />
+        <div
+          className={`relative bg-white transition-all duration-300 ${sidebarOpen ? "w-70" : "w-0"}`}
+        >
+          <div
+            className={`w-70 h-full transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+          >
+            <SideBar categories={categories} />
+          </div>
+
+          <button
+            className="absolute top-1/2 -right-5 z-20 h-10 w-10 bg-black shadow-lg rounded-full"
+            onClickCapture={() => setSideBarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? "<" : ">"}
+          </button>
         </div>
         {/*Main content*/}
-        <div className="flex-1 bg-green-500">
+        <div className="flex-1 bg-gray-500">
           {/* Sort bar */}
-          <div className="h-7 bg-pink-300">
+          <div className="h-7 bg-white mt-2 mx-2 flex items-center justify-end">
             <SortBar />
           </div>
           {/* Product grid */}

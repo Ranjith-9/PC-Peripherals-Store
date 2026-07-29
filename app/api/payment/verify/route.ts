@@ -6,14 +6,21 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
+import { rateLimiters } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
+  // 1. Authentication
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+  // 2. Rate limiting
+  const { success } = await rateLimiters.payment.limit(session.user.id);
 
+  if (!success) {
+    return NextResponse.json({ message: "Too many requests" }, { status: 429 });
+  }
   const { razorpay_payment_id, razorpay_order_id, razorpay_signature, data } =
     await req.json();
 

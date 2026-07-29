@@ -58,3 +58,16 @@ export async function getOrders() {
     },
   });
 }
+
+export async function getUserOrders(userId: string) {
+  return await db.order.findMany({
+    where: { userId },
+    include: {
+      items: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+}
