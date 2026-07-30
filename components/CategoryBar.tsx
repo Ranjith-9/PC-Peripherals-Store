@@ -22,13 +22,6 @@ export default function CategoryBar({ categories }: categoriesProp) {
     },
   ];
 
-  // const subCat = new Map<string, string[]>([
-  //   ["Gaming", ["Mouse", "Keyboard", "Pads"]],
-  //   ["Streaming", ["MIC", "Camera"]],
-  //   ["Components", ["GPU", "Motherboard", "CPU"]],
-  //   ["PC Builds", ["Gaming PCs", "Video Editing PCs", "Streaming PCs"]],
-  // ]);
-
   return (
     <div className="w-full bg-white">
       <div className="ml-[18rem] relative flex text-black gap-20 h-12 text-[18px] font-bold font-mono">

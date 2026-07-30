@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
       { status: 429 },
     );
   }
-  const body = await req.json();
 
-  const result = CartProductsSchema.safeParse(body);
+  const result = CartProductsSchema.safeParse(await req.json());
 
   if (!result.success) {
+    console.log("error being produced");
     return Response.json(
       { errors: z.treeifyError(result.error) },
       { status: 400 },

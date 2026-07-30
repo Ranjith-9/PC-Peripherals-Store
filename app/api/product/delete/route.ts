@@ -13,7 +13,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   // 2. Rate limiting
-  const { success } = await rateLimiters.products.limit(session.user.id);
+  const { success } = await rateLimiters.adminWrite.limit(session.user.id);
 
   if (!success) {
     return NextResponse.json({ message: "Too many requests" }, { status: 429 });

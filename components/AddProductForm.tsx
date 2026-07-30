@@ -48,6 +48,7 @@ export default function AddProductForm({
     );
   }, [isEdit, productDetails]);
 
+  // function
   const handleChange = (e: React.ChangeEvent<FormElement>) => {
     const { name, value } = e.target;
     const updatedForm = {
@@ -57,6 +58,7 @@ export default function AddProductForm({
 
     setForm(updatedForm);
   };
+
   // function to add product
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -114,6 +116,7 @@ export default function AddProductForm({
       stock: Number(form.stock),
       attributes: attributesJson,
     };
+
     const response = await fetch("/api/product/update", {
       method: "POST",
       headers: {
@@ -133,6 +136,7 @@ export default function AddProductForm({
     alert("Product updated successfully");
   };
 
+  // function to delete attribute
   const deleteAttribute = (index: number) => {
     setAttributes((prev) => prev.filter((_, i) => i !== index));
   };

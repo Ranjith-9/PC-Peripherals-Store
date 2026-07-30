@@ -254,8 +254,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     const result = await res.json();
 
-    console.log("error message", result);
-
     alert("product deleted sucessfully");
   };
 

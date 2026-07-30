@@ -57,16 +57,13 @@ export async function POST(req: NextRequest) {
       );
     }
   }
-
   const options = {
-    amount: data.totalAmount * 100,
+    amount: Math.round(data.totalAmount * 100),
     currency: "INR",
     receipt: "receipt_" + Date.now(),
   };
 
   const order = await razorpay.orders.create(options);
-
-  console.log("order from backend", order);
 
   return NextResponse.json(order);
 }

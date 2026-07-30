@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
     const response = await getUserOrders(userId);
     return NextResponse.json(response);
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       {
         message: error instanceof Error ? error.message : "Unknown error",
