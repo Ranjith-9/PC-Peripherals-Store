@@ -41,7 +41,7 @@ export default function ProductPanel({
         className="
         bg-gray-200
         relative group
-        w-72 h-[360px]
+        w-full max-w-sm h-[360px]
         rounded-md
         shadow-lg overflow-hidden
         hover:shadow-2xl

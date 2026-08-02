@@ -99,10 +99,7 @@ export default function ProductGrid({
     <div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
         {product.map((item: Product, index: number) => (
-          <div
-            className="flex items-center justify-center"
-            key={item.id ?? index}
-          >
+          <div key={item.id ?? index}>
             <ProductPanel
               productData={item}
               isAdmin={isAdmin}

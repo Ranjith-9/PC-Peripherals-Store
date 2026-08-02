@@ -20,6 +20,18 @@ export default function CategoryBar({ categories }: categoriesProp) {
       name: "Streaming",
       subcategories: ["Microphone", "Camera", "Capture Card"],
     },
+    {
+      name: "PC builds",
+      subcategories: ["Budget", "Comp", "Maxxed out"],
+    },
+    {
+      name: "Monitors",
+      subcategories: ["144", "240", "360"],
+    },
+    {
+      name: "Custom",
+      subcategories: ["Giga ATX", "Mini ATX", "ATX"],
+    },
   ];
 
   return (

@@ -23,7 +23,7 @@ export default function Home({ initialProducts, categories }: HomeViewProps) {
   const [sidebarOpen, setSideBarOpen] = useState(true);
   return (
     <div className="">
-      <div className="flex py-3 bg-slate-300">
+      <div className="flex py-1 bg-slate-300">
         <CategoryBar categories={categories} />
       </div>
       <div className="h-screen flex bg-gray-100">
@@ -47,7 +47,7 @@ export default function Home({ initialProducts, categories }: HomeViewProps) {
         {/*Main content*/}
         <div className="flex-1 bg-gray-500">
           {/* Sort bar */}
-          <div className="h-7 bg-white mt-2 mx-2 flex items-center justify-end">
+          <div className="h-7 bg-white mt-2 mx-4 flex items-center justify-end">
             <SortBar />
           </div>
           {/* Product grid */}

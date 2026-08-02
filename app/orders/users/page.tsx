@@ -1,13 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Package, CreditCard, MapPin } from "lucide-react";
-
+import {
+  ChevronDown,
+  Package,
+  CreditCard,
+  MapPin,
+  UserRound,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import type { Orders } from "@/types/order";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Orders[]>([]);
   const [expandedOrders, setExpandedOrders] = useState(new Set<string>());
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchOrders() {
@@ -44,7 +51,18 @@ export default function OrdersPage() {
 
   return (
     <div className="mx-auto max-w-7xl p-8 text-black">
-      <h1 className="mb-8 text-4xl font-bold">My Orders</h1>
+      <div className="mb-8 flex items-center gap-2 text-sm">
+        <button
+          onClick={() => router.push("/shop")}
+          className="font-medium text-gray-500 transition-colors hover:text-black"
+        >
+          Home
+        </button>
+
+        <span className="text-gray-400">›</span>
+
+        <span className="font-semibold text-gray-900">My Orders</span>
+      </div>
 
       {orders.length === 0 && (
         <div className="rounded-xl border bg-white p-12 text-center text-gray-500">

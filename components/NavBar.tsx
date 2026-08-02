@@ -1,11 +1,13 @@
 "use client";
 
-import { ShoppingCart, UserRound } from "lucide-react";
+import { ShoppingCart, UserRound, Logs } from "lucide-react";
 import LoginButton from "./LoginButton";
 import SearchBar from "./SearchBar";
 import type { Session } from "@/types/user";
 import { useStore } from "@/providers/StoreProvider";
 import Link from "next/link";
+
+import { useRouter } from "next/navigation";
 
 interface NavBarProps {
   session: Session | null;
@@ -13,6 +15,7 @@ interface NavBarProps {
 }
 
 export default function NavBar({ session, isAdmin = false }: NavBarProps) {
+  const router = useRouter();
   const { cartOpen, setCartOpen, cartItems, searchBarOpen } = useStore();
 
   return (
@@ -38,6 +41,7 @@ export default function NavBar({ session, isAdmin = false }: NavBarProps) {
           <LoginButton session={session} />
           {!isAdmin && (
             <>
+              {session && <Logs onClick={() => router.push("/orders/users")} />}
               <ShoppingCart
                 className="text-white cursor-pointer"
                 size={35}
