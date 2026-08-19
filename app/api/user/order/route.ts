@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
         { status: 500 },
       );
     const response = await getUserOrders(userId);
+    console.log("response from db for api/user call", response);
     return NextResponse.json(response);
   } catch (error) {
     return NextResponse.json(

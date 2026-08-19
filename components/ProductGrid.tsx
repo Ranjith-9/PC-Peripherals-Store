@@ -1,22 +1,26 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProductPanel from "./ProductPanel";
 import type { Product } from "@prisma/client";
 import { useStore } from "@/providers/StoreProvider";
+import { Filtertype } from "@/providers/StoreProvider";
 
 interface productGridProps {
   productData: Product[];
   isAdmin?: boolean;
+  mainCategory: string;
 }
 
 export default function ProductGrid({
   productData,
   isAdmin = false,
+  mainCategory,
 }: productGridProps) {
   const [product, setProduct] = useState<Product[]>(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const { filters, setFilters } = useStore();
+  const firstRender = useRef(true);
 
   //callback function to update products when edited or deleted
 
@@ -31,25 +35,28 @@ export default function ProductGrid({
   };
 
   useEffect(() => {
-    console.log("fetchProductsByCategory called");
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
+    const hasActiveFilters =
+      filters.search !== "" ||
+      filters.subcategory !== "" ||
+      filters.sort !== "latest" ||
+      Object.keys(filters.filters).length > 0;
+
+    if (!hasActiveFilters) {
+      return;
+    }
+    console.log("fetchProductsByCategory called", mainCategory);
     fetchProductsByCategory();
-  }, [filters]);
+  }, [filters, mainCategory]);
 
   async function fetchProductsByCategory() {
     setLoading(true);
     try {
-      const categories = filters.category || [];
-      const param = new URLSearchParams();
-
-      categories.forEach((category: string) => {
-        param.append("category", category);
-      });
-
-      param.append("sort", filters.sort);
-
-      if (filters.search) {
-        param.append("search", filters.search);
-      }
+      const param = filtersToSearchParams(filters, mainCategory);
 
       const res = await fetch(`/api/products?${param.toString()}`);
       const data = await res.json();
@@ -70,18 +77,8 @@ export default function ProductGrid({
     try {
       const lastProduct = product[product.length - 1];
       const cursor = lastProduct ? lastProduct.id : undefined;
-      const categories = filters.category || [];
-      const param = new URLSearchParams();
-      if (cursor) {
-        param.append("cursor", cursor.toString());
-      }
-      categories.forEach((category: string) => {
-        param.append("category", category);
-      });
-      param.append("sort", filters.sort);
-      if (filters.search) {
-        param.append("search", filters.search);
-      }
+
+      const param = filtersToSearchParams(filters, mainCategory, cursor);
 
       const res = await fetch(`/api/products?${param.toString()}`);
 
@@ -93,6 +90,39 @@ export default function ProductGrid({
     } finally {
       setLoading(false);
     }
+  }
+
+  function filtersToSearchParams(
+    filters: Filtertype,
+    mainCategory?: string,
+    cursor?: any,
+  ) {
+    const param = new URLSearchParams();
+
+    // Normal Filters
+    if (mainCategory) {
+      param.set("subcategory", mainCategory);
+    }
+    if (filters.sort) {
+      param.set("sort", filters.sort);
+    }
+
+    if (filters.search) {
+      param.set("search", filters.search);
+    }
+
+    if (cursor) {
+      param.append("cursor", cursor.toString());
+    }
+
+    // Dynamic Filters
+
+    Object.entries(filters.filters).forEach(([filterName, values]) => {
+      values.forEach((value) => {
+        param.append(filterName, value);
+      });
+    });
+    return param;
   }
 
   return (

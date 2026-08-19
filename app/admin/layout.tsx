@@ -3,6 +3,7 @@ import "../globals.css";
 import NavBar from "@/components/NavBar";
 import { getServerSession } from "next-auth/next";
 import type { Session } from "@/types/user";
+import AdminPageSelect from "@/components/AdminPageSelect";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,8 +19,15 @@ export default async function RootLayout({
 
   return (
     <>
-      <NavBar session={session} isAdmin={true} />
-      {children}
+      <div className="A1">
+        <NavBar session={session} isAdmin={true} />
+      </div>
+      <div className="A2 flex">
+        <div className="B1 h-min-screen">
+          <AdminPageSelect />
+        </div>
+        <div className="B2 flex-1 p-10 bg-gray-100">{children}</div>
+      </div>
     </>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
-import type { Filtertype } from "@/types/filter";
 import type { Product } from "@prisma/client";
 
 export type CartItem = {
@@ -13,6 +12,14 @@ export type MergedProduct = Product & {
   quantity: number;
 };
 
+export interface Filtertype {
+  sort: string;
+  search: string;
+  subcategory: string;
+  filters: {
+    [key: string]: string[];
+  };
+}
 type StoreContextType = {
   filters: Filtertype;
   setFilters: React.Dispatch<React.SetStateAction<Filtertype>>;
@@ -40,16 +47,28 @@ type StoreContextType = {
   incrementItem: (productId: string) => Promise<void>;
 
   decrementItem: (productId: string) => void;
+
+  resetFilters: () => void;
 };
 
 const StoreContext = createContext<StoreContextType | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<Filtertype>({
-    category: [],
     sort: "latest",
     search: "",
+    subcategory: "",
+    filters: {},
   });
+
+  const resetFilters = () => {
+    setFilters({
+      sort: "latest",
+      search: "",
+      subcategory: "",
+      filters: {},
+    });
+  };
 
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -262,6 +281,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       value={{
         filters,
         setFilters,
+        resetFilters,
         cartOpen,
         setCartOpen,
         cartItems,

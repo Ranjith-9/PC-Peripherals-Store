@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import slugify from "slugify";
 import { createId } from "@paralleldrive/cuid2";
 import { Product } from "@prisma/client";
+import { getProductAndFiltersByIds } from "@/services/product";
+import { Check, X } from "lucide-react";
 
 interface ProductFormProps {
   isEdit?: boolean;
@@ -19,34 +21,61 @@ export default function AddProductForm({
 }: ProductFormProps) {
   type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
   const [attributes, setAttributes] = useState([{ key: "", value: "" }]);
+  const [newFilter, setNewFilter] = useState({
+    key: "",
+    value: "",
+  });
+  const [existingFilters, setExistingFilters] = useState([
+    { key: "", value: "", id: "" },
+  ]);
+
+  const [detailedProduct, setDetailedProduct] = useState();
+
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
     imageUrl: "",
-    category: "",
     stock: "",
   });
 
+  // first half of the product being set by form, which is passed down by productPanel
   useEffect(() => {
     if (!isEdit || !productDetails) return;
+    getFullProductDetails(productDetails.id);
+  }, [isEdit, productDetails]);
+
+  //function to fetch detailed product + fitler from database
+  async function getFullProductDetails(productId: string) {
+    const response = await fetch(`/api/detailedproduct/${productId}`);
+    const product = await response.json();
+
+    console.log("product from backend", product);
 
     setForm({
-      name: productDetails.name,
-      description: productDetails.description,
-      price: productDetails.price.toString(),
-      imageUrl: productDetails.imageUrl,
-      category: productDetails.category,
-      stock: productDetails.stock.toString(),
+      name: product.name,
+      description: product.description,
+      price: product.price.toString(),
+      imageUrl: product.imageUrl,
+      stock: product.stock.toString(),
     });
 
     setAttributes(
-      Object.entries(productDetails.attributes ?? {}).map(([key, value]) => ({
+      Object.entries(product.attributes ?? {}).map(([key, value]) => ({
         key,
         value: String(value),
       })),
     );
-  }, [isEdit, productDetails]);
+
+    setDetailedProduct(product);
+    setExistingFilters(
+      Object.entries(product.filters ?? {}).map(([key, [value, filterId]]) => ({
+        key,
+        value: String(value),
+        id: filterId,
+      })),
+    );
+  }
 
   // function
   const handleChange = (e: React.ChangeEvent<FormElement>) => {
@@ -141,6 +170,49 @@ export default function AddProductForm({
     setAttributes((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const addFilter = async (key: string, value: string) => {
+    if (!detailedProduct) {
+      return;
+    }
+    const response = await fetch("/api/filter/addFilter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        key,
+        value,
+        subCatId: detailedProduct.subcategoryId,
+        productId: detailedProduct.id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.log(data.message);
+      return;
+    }
+
+    getFullProductDetails(productDetails.id);
+    console.log("success:", data.message);
+  };
+
+  const deleteFilter = async (filterId: string, productId: string) => {
+    const response = await fetch(`/api/filter/${filterId}/${productId}`, {
+      method: "DELETE",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(result);
+    }
+
+    getFullProductDetails(productDetails.id);
+    console.log("success:", result.message);
+  };
+
   return (
     <div className="mx-auto max-w-4xl border border-gray-200 bg-white p-8 shadow-sm text-black">
       <div className="flex justify-between">
@@ -213,17 +285,6 @@ export default function AddProductForm({
                 value={form.stock}
                 onChange={handleChange}
                 placeholder="50"
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">Category</label>
-              <input
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                placeholder="Mouse"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
               />
             </div>
@@ -318,6 +379,76 @@ export default function AddProductForm({
           )}
         </div>
       </form>
+      {/* {FILTER ELEMENTS} */}
+      {isEdit && (
+        <div className="mt-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold"> Filters</h2>
+          </div>
+          {existingFilters &&
+            existingFilters.map((filter, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4"
+              >
+                <div className="flex-1 rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500">
+                  {filter.key}
+                </div>
+                <div className="flex-1 rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500">
+                  {filter.value}
+                </div>
+
+                {!filter.key ? (
+                  <button>
+                    {" "}
+                    <Check />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => deleteFilter(filter.id, detailedProduct.id)}
+                  >
+                    {" "}
+                    <X />
+                  </button>
+                )}
+              </div>
+            ))}
+          <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <input
+              placeholder="Filter Name"
+              value={newFilter.key}
+              onChange={(e) =>
+                setNewFilter((prev) => ({
+                  ...prev,
+                  key: e.target.value,
+                }))
+              }
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500"
+            />
+
+            <input
+              placeholder="Filter Value"
+              value={newFilter.value}
+              onChange={(e) =>
+                setNewFilter((prev) => ({
+                  ...prev,
+                  value: e.target.value,
+                }))
+              }
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500"
+            />
+
+            <button
+              onClick={() => addFilter(newFilter.key, newFilter.value)}
+              className="rounded-lg bg-green-100 p-2 text-green-600 hover:bg-green-200"
+            >
+              <Check />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+//

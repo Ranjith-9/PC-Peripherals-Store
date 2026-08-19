@@ -8,12 +8,14 @@ import type { Product } from "@prisma/client";
 
 interface updateProductsProps {
   initialProducts: Product[];
-  categories: string[];
+  categoryFilters: any;
+  mainCategory: string;
 }
 
 export default function UpdateProducts({
-  categories,
+  categoryFilters,
   initialProducts,
+  mainCategory,
 }: updateProductsProps) {
   return (
     <div>
@@ -26,12 +28,16 @@ export default function UpdateProducts({
           </div>
           {/* Product grid */}
           <div className="p-4">
-            <ProductGrid productData={initialProducts} isAdmin={true} />
+            <ProductGrid
+              productData={initialProducts}
+              mainCategory={mainCategory}
+              isAdmin={true}
+            />
           </div>
         </div>
         {/*Side bar*/}
         <div className="w-50 bg-gray-300">
-          <SideBar categories={categories} />
+          <SideBar categoryFilters={categoryFilters} />
         </div>
       </div>
     </div>

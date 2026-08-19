@@ -1,97 +1,175 @@
 "use client";
+
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import type { Filtertype } from "@/types/filter";
 import { useStore } from "@/providers/StoreProvider";
-
-interface SideBarProps {
-  categories: string[];
+export interface FilterOption {
+  name: string;
+  values: string[];
 }
 
-export default function SideBar({ categories }: SideBarProps) {
-  const options = [
-    {
-      title: "Categories",
-      options: categories,
-    },
-    {
-      title: "comp",
-      options: ["item1", "item2"],
-    },
-  ];
+interface SideBarProps {
+  categoryFilters: FilterOption[];
+}
 
-  const [openSection, setOpenSection]: any = useState({});
+export default function SideBar({ categoryFilters }: SideBarProps) {
   const { filters, setFilters } = useStore();
 
+  const [openSection, setOpenSection] = useState<Record<string, boolean>>({});
+
+  /*
+   * Open / close a filter section
+   */
+  const toggleSection = (name: string) => {
+    setOpenSection((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
+
+  /*
+   * Check whether a filter option is selected
+   */
+  const isSelected = (filterName: string, value: string) => {
+    return filters.filters[filterName]?.includes(value) ?? false;
+  };
+
+  /*
+   * Select / unselect a filter option
+   */
+  const toggleFilter = (filterName: string, value: string) => {
+    setFilters((prev) => {
+      const currentValues = prev.filters[filterName] ?? [];
+
+      const updatedValues = currentValues.includes(value)
+        ? currentValues.filter((item) => item !== value)
+        : [...currentValues, value];
+
+      return {
+        ...prev,
+        filters: {
+          ...prev.filters,
+          [filterName]: updatedValues,
+        },
+      };
+    });
+  };
+
+  /*
+   * Clear all selections for one filter
+   */
+  const clearFilter = (filterName: string) => {
+    setFilters((prev) => {
+      const updatedfilters = {
+        ...prev.filters,
+      };
+
+      delete updatedfilters[filterName];
+
+      return {
+        ...prev,
+        filters: updatedfilters,
+      };
+    });
+  };
+
+  /*
+   * Number of selected options in a filter
+   */
+  const selectedCount = (filterName: string) => {
+    return filters.filters[filterName]?.length ?? 0;
+  };
+
   return (
-    <div className="w-full p-6 space-y-8 text-black">
-      {options.map((section) => (
-        <div key={section.title}>
-          <div className="w-full flex items-center justify-between py-2">
-            {/* Left Side */}
-            <span className="font-semibold text-lg">{section.title}</span>
+    <aside className="w-full text-black">
+      {categoryFilters &&
+        categoryFilters.map((section) => {
+          const isOpen = openSection[section.name] ?? false;
+          const count = selectedCount(section.name);
 
-            {/* Right Side */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setFilters((prev: Filtertype) => ({
-                    ...prev,
-                    category: [],
-                  }));
-                }}
-                className="text-sm text-gray-500 hover:text-black"
-              >
-                Clear
-              </button>
+          return (
+            <div key={section.name} className="border-b border-gray-200 py-4">
+              {/* ================= HEADER ================= */}
 
-              <button
-                onClick={() =>
-                  setOpenSection((prev: any) => ({
-                    ...prev,
-                    [section.title]: !prev[section.title],
-                  }))
+              <div className="flex items-center justify-between">
+                {/* Filter name + selected count */}
+
+                <div className="flex items-center gap-2">
+                  <span className="font-medium capitalize">{section.name}</span>
+
+                  {count > 0 && (
+                    <span className="text-xs text-black">({count})</span>
+                  )}
+                </div>
+
+                {/* Right side */}
+
+                <div className="flex items-center gap-3">
+                  {count > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => clearFilter(section.name)}
+                      className="text-sm text-black hover:text-black"
+                    >
+                      Clear
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.name)}
+                    aria-label={`Toggle ${section.name}`}
+                  >
+                    <ChevronDown
+                      size={18}
+                      className={`
+                      transition-transform duration-300
+                      ${isOpen ? "rotate-180" : ""}
+                    `}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* ================= OPTIONS ================= */}
+
+              <div
+                className={`
+                grid transition-all duration-300
+                ${
+                  isOpen
+                    ? "mt-3 grid-rows-[1fr] opacity-100"
+                    : "grid-rows-[0fr] opacity-0"
                 }
+              `}
               >
-                <ChevronDown
-                  className={`
-          transition-transform duration-300
-          ${openSection[section.title] ? "rotate-180" : ""}
-        `}
-                />
-              </button>
+                <div className="overflow-hidden">
+                  <div className="flex flex-col gap-2">
+                    {section.values.map((value) => {
+                      const checked = isSelected(section.name, value);
+
+                      return (
+                        <label
+                          key={value}
+                          className="flex cursor-pointer items-center gap-2 text-sm"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleFilter(section.name, value)}
+                            className="h-4 w-4 cursor-pointer"
+                          />
+
+                          <span>{value}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div
-            className={`overflow-hidden transition-all duration-300 ${openSection[section.title] ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}
-          >
-            {section.options.map((option) => (
-              <label key={option} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={filters.category.includes(option)}
-                  onChange={() => {
-                    setFilters((prev: Filtertype) => {
-                      const current = prev.category;
-
-                      const updated = current.includes(option)
-                        ? current.filter((item) => item !== option)
-                        : [...current, option];
-
-                      return {
-                        ...prev,
-                        category: updated,
-                      };
-                    });
-                  }}
-                />
-                <span className="ml-2">{option}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
+          );
+        })}
+    </aside>
   );
 }

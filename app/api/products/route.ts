@@ -14,16 +14,30 @@ export async function GET(req: NextRequest) {
   if (!success) {
     return NextResponse.json({ message: "Too many requests" }, { status: 429 });
   }
+  const searchParams = req.nextUrl.searchParams;
 
-  const cursor = req.nextUrl.searchParams.get("cursor") || undefined;
+  const cursor = searchParams.get("cursor") || undefined;
+  const sort = searchParams.get("sort") || "latest";
+  const search = searchParams.get("search") || undefined;
 
-  const category = req.nextUrl.searchParams.getAll("category") || undefined;
+  const subcategory = searchParams.get("subcategory") || "";
 
-  const sort = req.nextUrl.searchParams.get("sort") || "latest";
+  const reservedParams = new Set(["cursor", "sort", "search", "subcategory"]);
 
-  const search = req.nextUrl.searchParams.get("search") || undefined;
+  const filters: Record<string, string[]> = {};
+  for (const key of new Set(searchParams.keys())) {
+    if (reservedParams.has(key)) continue;
 
-  const products = await getProducts(cursor, category, sort, search);
+    filters[key] = searchParams.getAll(key);
+  }
 
-  return NextResponse.json({ products, hasMore: products.length === 10 });
+  const products = await getProducts(
+    subcategory,
+    filters,
+    sort,
+    search,
+    cursor,
+  );
+
+  return NextResponse.json({ products, hasMore: products.length === 5 });
 }

@@ -1,9 +1,19 @@
 "use client";
 import { useStore } from "@/providers/StoreProvider";
 import { useState } from "react";
-import type { Product } from "@/types/product";
+import { Prisma } from "@prisma/client";
 
-export default function ProductView({ Product }: { Product: Product }) {
+type ProductWithCategory = Prisma.ProductGetPayload<{
+  include: {
+    categoryRef: true;
+  };
+}>;
+
+export default function ProductView({
+  Product,
+}: {
+  Product: ProductWithCategory;
+}) {
   const [quantity, setQuantity] = useState(1);
 
   const attributes =
@@ -30,7 +40,7 @@ export default function ProductView({ Product }: { Product: Product }) {
         <div className="flex flex-col gap-6">
           <div>
             <p className="text-sm text-gray-500 uppercase tracking-wide">
-              {Product.category}
+              {Product.categoryRef.name}
             </p>
 
             <h1 className="text-4xl font-bold mt-2">{Product.name}</h1>

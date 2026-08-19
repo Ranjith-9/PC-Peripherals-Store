@@ -5,13 +5,14 @@ import ProductGrid from "@/components/ProductGrid";
 import SideBar from "@/components/SideBar";
 import SortBar from "./SortBar";
 import CategoryBar from "@/components/CategoryBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 //Types
 import type { Product } from "@prisma/client";
 
 interface HomeViewProps {
   initialProducts: Product[];
-  categories: string[];
+  mainCategory: string;
+  categoryFilters: any;
 }
 
 export interface CartItem {
@@ -19,13 +20,18 @@ export interface CartItem {
   quantity: number;
 }
 
-export default function Home({ initialProducts, categories }: HomeViewProps) {
+export default function Home({
+  initialProducts,
+  mainCategory,
+  categoryFilters,
+}: HomeViewProps) {
   const [sidebarOpen, setSideBarOpen] = useState(true);
+
   return (
     <div className="">
-      <div className="flex py-1 bg-slate-300">
-        <CategoryBar categories={categories} />
-      </div>
+      {/* <div className="flex py-1 bg-slate-300">
+        <CategoryBar mainCategory={mainCategory} />
+      </div> */}
       <div className="h-screen flex bg-gray-100">
         {/*Side bar*/}
         <div
@@ -34,7 +40,7 @@ export default function Home({ initialProducts, categories }: HomeViewProps) {
           <div
             className={`w-70 h-full transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
           >
-            <SideBar categories={categories} />
+            <SideBar categoryFilters={categoryFilters} />
           </div>
 
           <button
@@ -52,7 +58,10 @@ export default function Home({ initialProducts, categories }: HomeViewProps) {
           </div>
           {/* Product grid */}
           <div className="p-4">
-            <ProductGrid productData={initialProducts} />
+            <ProductGrid
+              productData={initialProducts}
+              mainCategory={mainCategory}
+            />
           </div>
         </div>
       </div>

@@ -37,18 +37,85 @@ model Account {
 }
 
 model Product {
-  id          String      @id @default(cuid())
+  id String @id @default(cuid())
+
   name        String
   description String
   price       Float
   imageUrl    String
-  category    String
   stock       Int
-  createdAt   DateTime    @default(now())
-  attributes  Json
-  slug        String?     @unique
-  isActive    Boolean?    @default(true)
-  orderItems  OrderItem[]
+
+  createdAt DateTime @default(now())
+
+  slug     String? @unique
+  isActive Boolean @default(true)
+
+  /// Technical specifications displayed on the product page
+  attributes Json
+
+  /// Relationship to SubCategory
+  subCategoryId String
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
+
+  /// Existing relationship
+  orderItems OrderItem[]
+
+  /// Junction table for filters
+  filterValues ProductFilterValue[]
+}
+
+model MainCategory {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  subCategories SubCategory[]
+}
+
+model SubCategory {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  mainCategoryId String
+  mainCategory   MainCategory @relation(fields: [mainCategoryId], references: [id])
+
+  products         Product[]
+  filterCategories FilterCategory[]
+
+  @@unique([mainCategoryId, name])
+}
+
+model FilterCategory {
+  id            String      @id @default(cuid())
+  name          String
+  subCategoryId String
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
+
+  values FilterValue[]
+
+  @@unique([subCategoryId, name])
+}
+
+model FilterValue {
+  id               String         @id @default(cuid())
+  value            String
+  filterCategoryId String
+  filterCategory   FilterCategory @relation(fields: [filterCategoryId], references: [id])
+ 
+  products ProductFilterValue[]
+
+  @@unique([filterCategoryId, value])
+}
+
+model ProductFilterValue {
+  productId     String
+  filterValueId String
+
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  filterValue FilterValue @relation(fields: [filterValueId], references: [id], onDelete: Cascade)
+
+  @@id([productId, filterValueId])
 }
 
 model Address {

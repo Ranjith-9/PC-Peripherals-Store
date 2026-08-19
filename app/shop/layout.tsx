@@ -4,6 +4,8 @@ import NavBar from "@/components/NavBar";
 import { getServerSession } from "next-auth/next";
 import type { Session } from "@/types/user";
 import CartView from "@/components/CartView";
+import CategoryBar from "@/components/CategoryBar";
+import { getMainSubCategory } from "@/services/category";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,11 +18,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session: Session | null = await getServerSession(); // Fetch session data on the server side
+  const mainCategory = await getMainSubCategory();
 
   return (
     <>
       <NavBar session={session} />
       <CartView />
+      <div className="flex py-1 bg-slate-300">
+        <CategoryBar mainCategory={mainCategory} />
+      </div>
       {children}
     </>
   );

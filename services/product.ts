@@ -3,13 +3,31 @@ import type { CreateAddressInput } from "@/types/input";
 import { Product } from "@prisma/client";
 
 export async function getProducts(
-  cursor?: string,
-  category?: string[],
+  subcategory: string,
+  filters: Record<string, string[]> = {},
   sort: string = "latest",
   search?: string,
+  cursor?: string,
 ) {
+  const filterConditions = Object.entries(filters)
+    .filter(([, values]) => values.length > 0)
+    .map(([filterName, values]) => ({
+      filterValues: {
+        some: {
+          filterValue: {
+            filterCategory: {
+              name: filterName,
+            },
+            value: {
+              in: values,
+            },
+          },
+        },
+      },
+    }));
+
   const product = await db.product.findMany({
-    take: 10,
+    take: 5,
 
     ...(cursor && {
       cursor: { id: cursor },
@@ -18,19 +36,21 @@ export async function getProducts(
 
     where: {
       isActive: true,
-
-      ...(category &&
-        category.length > 0 && {
-          category: {
-            in: category,
-          },
-        }),
+      ...(subcategory && {
+        subCategory: {
+          slug: subcategory,
+        },
+      }),
 
       ...(search && {
         name: {
           contains: search,
           mode: "insensitive",
         },
+      }),
+
+      ...(filterConditions.length > 0 && {
+        AND: filterConditions,
       }),
     },
 
@@ -44,15 +64,17 @@ export async function getProducts(
   return product;
 }
 
-export async function getCategory() {
-  const category = await db.product.findMany({
-    distinct: ["category"],
-    select: {
-      category: true,
-    },
-  });
-  return category.map((item: any) => item.category);
-}
+// export async function getCategory() {
+//   const categories = await db.category.findMany({
+//     select: {
+//       name: true,
+//     },
+//     orderBy: {
+//       name: "asc",
+//     },
+//   });
+//   return categories.map((item: any) => item.name);
+// }
 
 export async function getProductByIds(ids: string[]) {
   const product = await db.product.findMany({
@@ -130,6 +152,32 @@ export async function deleteProduct(id: string) {
     },
     data: {
       isActive: false,
+    },
+  });
+}
+
+export async function getProductAndFiltersByIds(id: string) {
+  if (!id) return;
+  return await db.product.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      filterValues: {
+        include: {
+          filterValue: true,
+        },
+      },
+
+      subCategory: {
+        include: {
+          filterCategories: {
+            include: {
+              values: true,
+            },
+          },
+        },
+      },
     },
   });
 }

@@ -18,15 +18,15 @@ export default function ProductPanel({
   onUpdate,
   onDelete,
 }: ProductPanelProps) {
-  const { addToCart } = useStore();
-  const { deleteProduct } = useStore();
-  const [flag, setFlag] = useState(false);
+  const { addToCart, deleteProduct } = useStore();
 
+  const [flag, setFlag] = useState(false);
+  console.log("ProductPanel rendered ");
   return (
     <div className="">
       {flag && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[900px] h-[700px] overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div className="w-[900px] h-[700px] overflow-y-auto rounded-xl bg-white p-6 shadow-xl scale-90">
             <AddProductForm
               isEdit={true}
               productDetails={productData}
@@ -48,7 +48,7 @@ export default function ProductPanel({
         transition-shadow duration-300
       "
       >
-        <Link href={`/shop/product/${productData.slug}`}>
+        <Link href={`/shop/product/${productData.slug}`} prefetch={false}>
           {/* Image */}
           <div className="h-[260px] overflow-hidden">
             <img
