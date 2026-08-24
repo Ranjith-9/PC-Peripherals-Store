@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { useStore } from "@/providers/StoreProvider";
 import { useFilter } from "@/providers/FilterProvider";
 export interface FilterOption {
   name: string;
@@ -82,7 +81,7 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
   };
 
   return (
-    <aside className="w-full text-black">
+    <aside className="w-full text-black p-4 ">
       {categoryFilters &&
         categoryFilters.map((section) => {
           const isOpen = openSection[section.name] ?? false;
@@ -96,7 +95,7 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
                 {/* Filter name + selected count */}
 
                 <div className="flex items-center gap-2">
-                  <span className="font-medium capitalize">{section.name}</span>
+                  <span className="font-bold capitalize">{section.name}</span>
 
                   {count > 0 && (
                     <span className="text-xs text-black">({count})</span>

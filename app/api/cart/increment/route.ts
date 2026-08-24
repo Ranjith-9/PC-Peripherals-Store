@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkProductStock } from "@/services/product";
 import { IncreaseItemZod } from "@/zodSchema/order";
 import { rateLimiters } from "@/lib/rateLimiter";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
 // need to authenticate the user before allowed to make changes to the stock
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
     req.headers.get("x-real-ip") ??

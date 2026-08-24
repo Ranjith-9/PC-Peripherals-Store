@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart, UserRound, Logs } from "lucide-react";
+import { ShoppingCart, Logs } from "lucide-react";
 import LoginButton from "./LoginButton";
 import SearchBar from "./SearchBar";
 import type { Session } from "@/types/user";
@@ -19,7 +19,7 @@ export default function NavBar({ session, isAdmin = false }: NavBarProps) {
   const { cartOpen, setCartOpen, cartItems, searchBarOpen } = useStore();
 
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className="bg-neutral-900 p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left */}
         <Link href="/shop/mouse">

@@ -28,9 +28,9 @@ export default function CategoryBar({
   };
 
   return (
-    <div className="w-full bg-white">
-      <div className="ml-[18rem] relative flex text-black gap-20 h-12 text-[18px] font-bold font-mono">
-        {placeHolder.map((cat, index) => (
+    <div className="w-full bg-neutral-800">
+      <div className="ml-[18rem] relative flex text-white gap-20 h-12 text-[18px] font-bold font-mono">
+        {placeHolder.map((cat: any, index: number) => (
           <div
             key={cat.name}
             className="flex items-center"
@@ -39,12 +39,12 @@ export default function CategoryBar({
           >
             {cat.name}
             {hover == index && (
-              <div className="absolute w-190 border bg-gray-300 shadow-lg z-1 left-0 top-12">
+              <div className="absolute w-190 border bg-gray-200 shadow-lg z-1 left-0 top-12">
                 {" "}
-                {cat.subcategories.map((sub, subIndex) => (
+                {cat.subcategories.map((sub: any, subIndex: number) => (
                   <div
                     key={sub}
-                    className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                    className="cursor-pointer text-black px-4 py-2 hover:bg-gray-100"
                     onClick={() => handleCategoryClick(cat.slug[subIndex])}
                   >
                     {sub}

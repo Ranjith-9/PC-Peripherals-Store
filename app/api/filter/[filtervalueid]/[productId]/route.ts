@@ -7,7 +7,7 @@ interface RouteProps {
   }>;
 }
 
-export async function DELETE(req: NextRequest, { params }: RouteProps) {
+export async function DELETE({ params }: RouteProps) {
   try {
     const { filtervalueid, productId } = await params;
     console.log("filter value", filtervalueid);

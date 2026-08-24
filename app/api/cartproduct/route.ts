@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getProductByIds } from "@/services/product";
 import { CartProductsSchema } from "@/zodSchema/product";
 import { z } from "zod";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { rateLimiters } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {

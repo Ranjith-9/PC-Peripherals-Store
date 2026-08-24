@@ -8,6 +8,15 @@ export async function POST(req: NextRequest) {
     req.headers.get("x-real-ip") ??
     "unknown";
 
+  const { success } = await rateLimiters.products.limit(ip);
+
+  if (!success) {
+    return Response.json(
+      { message: "Too many payment attempts" },
+      { status: 429 },
+    );
+  }
+
   try {
     const data = await req.json();
 

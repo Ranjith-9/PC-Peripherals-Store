@@ -32,13 +32,13 @@ export default function Home({
       {/* <div className="flex py-1 bg-slate-300">
         <CategoryBar mainCategory={mainCategory} />
       </div> */}
-      <div className="h-screen flex bg-gray-100">
+      <div className="min-h-screen flex bg-gray-100">
         {/*Side bar*/}
         <div
           className={`relative bg-white transition-all duration-300 ${sidebarOpen ? "w-70" : "w-0"}`}
         >
           <div
-            className={`w-70 h-full transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+            className={`w-70 h-full transition-transform duration-300 bg-neutral-200  ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
           >
             <SideBar categoryFilters={categoryFilters} />
           </div>

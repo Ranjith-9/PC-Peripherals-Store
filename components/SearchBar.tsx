@@ -1,5 +1,5 @@
 import { useStore } from "@/providers/StoreProvider";
-import type { Filtertype } from "@/providers/StoreProvider";
+import type { Filtertype } from "@/providers/FilterProvider";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { useFilter } from "@/providers/FilterProvider";
