@@ -1,32 +1,31 @@
 import { db } from "@/lib/db";
 import HomeView from "@/components/HomeView";
-import { useStore } from "@/providers/StoreProvider";
-import { getProducts } from "@/services/product";
+
+import { getProducts, getFilters } from "@/services/product";
 
 export default async function category({
   params,
 }: {
   params: Promise<{ category: string }>;
 }) {
-  const { category } = await params;
-  const product = await getProducts(category, {});
-  const filter_response = await db.subCategory.findUnique({
-    where: {
-      slug: category,
-    },
-    include: {
-      filterCategories: {
-        include: {
-          values: true,
-        },
-      },
-    },
-  });
+  console.time("TOTAL PAGE");
 
-  const filters = filter_response?.filterCategories.map((category: any) => ({
-    name: category.name,
-    values: category.values.map((value: any) => value.value),
-  }));
+  const { category } = await params;
+
+  console.time("getProducts");
+  console.time("getFilters");
+
+  const [product, filters] = await Promise.all([
+    getProducts(category, {}).finally(() => {
+      console.timeEnd("getProducts");
+    }),
+
+    getFilters(category).finally(() => {
+      console.timeEnd("getFilters");
+    }),
+  ]);
+
+  console.timeEnd("TOTAL PAGE");
 
   return (
     <div>

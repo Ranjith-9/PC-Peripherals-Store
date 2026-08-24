@@ -1,7 +1,8 @@
 import { useStore } from "@/providers/StoreProvider";
+import { useFilter } from "@/providers/FilterProvider";
 
 export default function SortBar() {
-  const { filters, setFilters } = useStore();
+  const { filters, setFilters } = useFilter();
 
   return (
     <div className="text-black flex justify-end ">

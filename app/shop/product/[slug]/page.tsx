@@ -19,6 +19,8 @@ export default async function product({
     notFound();
   }
 
+  console.log("verifying product before passing to product view:", product);
+
   return (
     <div>
       <ProductView Product={product} />

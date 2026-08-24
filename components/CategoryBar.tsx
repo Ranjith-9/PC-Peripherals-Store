@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/providers/StoreProvider";
+import { useFilter } from "@/providers/FilterProvider";
 
 interface categoriesProp {
   mainCategory: any;
@@ -15,7 +16,7 @@ export default function CategoryBar({
   const [hover, setHover] = useState<number | null>(null);
   const placeHolder = mainCategory;
   const router = useRouter();
-  const { resetFilters } = useStore();
+  const { resetFilters } = useFilter();
 
   const handleCategoryClick = (slug: string) => {
     resetFilters();

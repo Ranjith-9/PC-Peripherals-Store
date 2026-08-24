@@ -27,7 +27,7 @@ export async function getProducts(
     }));
 
   const product = await db.product.findMany({
-    take: 5,
+    take: 20,
 
     ...(cursor && {
       cursor: { id: cursor },
@@ -63,18 +63,6 @@ export async function getProducts(
   });
   return product;
 }
-
-// export async function getCategory() {
-//   const categories = await db.category.findMany({
-//     select: {
-//       name: true,
-//     },
-//     orderBy: {
-//       name: "asc",
-//     },
-//   });
-//   return categories.map((item: any) => item.name);
-// }
 
 export async function getProductByIds(ids: string[]) {
   const product = await db.product.findMany({
@@ -180,4 +168,54 @@ export async function getProductAndFiltersByIds(id: string) {
       },
     },
   });
+}
+
+export async function getFilters(category: string) {
+  console.time("filterCategories query");
+  console.time("filterValues query");
+  const [filterCategories, filterValues] = await Promise.all([
+    db.filterCategory
+      .findMany({
+        where: {
+          subCategory: {
+            slug: category,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+      .finally(() => {
+        console.timeEnd("filterCategories query");
+      }),
+
+    db.filterValue
+      .findMany({
+        where: {
+          filterCategory: {
+            subCategory: {
+              slug: category,
+            },
+          },
+        },
+        select: {
+          value: true,
+          filterCategoryId: true,
+        },
+      })
+      .finally(() => {
+        console.timeEnd("filterValues query");
+      }),
+  ]);
+
+  return filterCategories.map((filterCategory: any) => ({
+    name: filterCategory.name,
+    values: filterValues
+      .filter(
+        (filterValue: any) =>
+          filterValue.filterCategoryId === filterCategory.id,
+      )
+      .map((filterValue: any) => filterValue.value),
+  }));
 }

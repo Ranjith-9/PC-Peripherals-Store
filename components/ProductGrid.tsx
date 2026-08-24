@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import ProductPanel from "./ProductPanel";
 import type { Product } from "@prisma/client";
-import { useStore } from "@/providers/StoreProvider";
-import { Filtertype } from "@/providers/StoreProvider";
+import type { Filtertype } from "@/providers/FilterProvider";
+import { useFilter } from "@/providers/FilterProvider";
 
 interface productGridProps {
   productData: Product[];
@@ -19,7 +19,7 @@ export default function ProductGrid({
   const [product, setProduct] = useState<Product[]>(productData);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filters, setFilters } = useStore();
+  const { filters } = useFilter();
   const firstRender = useRef(true);
 
   //callback function to update products when edited or deleted
@@ -60,9 +60,9 @@ export default function ProductGrid({
 
       const res = await fetch(`/api/products?${param.toString()}`);
       const data = await res.json();
-
       setProduct(data.products);
       setHasMore(data.hasMore);
+      console.log("fetchproduct categroy running");
     } catch (error) {
       console.error("Failed to fetch products", error);
     } finally {
@@ -135,11 +135,12 @@ export default function ProductGrid({
               isAdmin={isAdmin}
               onUpdate={handleProductUpdate}
               onDelete={handleProductDelete}
+              index={index}
             />
           </div>
         ))}
       </div>
-      <div className="m">
+      <div className={`${hasMore ? "" : "hidden"}`}>
         <button
           onClick={loadMore}
           disabled={loading || !hasMore}

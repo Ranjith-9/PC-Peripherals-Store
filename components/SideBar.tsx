@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useStore } from "@/providers/StoreProvider";
+import { useFilter } from "@/providers/FilterProvider";
 export interface FilterOption {
   name: string;
   values: string[];
@@ -13,7 +14,7 @@ interface SideBarProps {
 }
 
 export default function SideBar({ categoryFilters }: SideBarProps) {
-  const { filters, setFilters } = useStore();
+  const { filters, setFilters } = useFilter();
 
   const [openSection, setOpenSection] = useState<Record<string, boolean>>({});
 

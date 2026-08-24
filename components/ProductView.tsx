@@ -1,19 +1,9 @@
 "use client";
-import { useStore } from "@/providers/StoreProvider";
+import { useStoreActions } from "@/providers/StoreProvider";
 import { useState } from "react";
-import { Prisma } from "@prisma/client";
+import { Product } from "@prisma/client";
 
-type ProductWithCategory = Prisma.ProductGetPayload<{
-  include: {
-    categoryRef: true;
-  };
-}>;
-
-export default function ProductView({
-  Product,
-}: {
-  Product: ProductWithCategory;
-}) {
+export default function ProductView({ Product }: { Product: Product }) {
   const [quantity, setQuantity] = useState(1);
 
   const attributes =
@@ -21,7 +11,11 @@ export default function ProductView({
       ? Object.entries(Product.attributes as Record<string, any>)
       : [];
 
-  const { addToCart } = useStore();
+  const { addToCart } = useStoreActions();
+
+  const handleAddToCart = () => {
+    addToCart(Product, quantity);
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 text-gray-800">
@@ -40,7 +34,7 @@ export default function ProductView({
         <div className="flex flex-col gap-6">
           <div>
             <p className="text-sm text-gray-500 uppercase tracking-wide">
-              {Product.categoryRef.name}
+              {Product.name}
             </p>
 
             <h1 className="text-4xl font-bold mt-2">{Product.name}</h1>
@@ -85,7 +79,7 @@ export default function ProductView({
 
           {/* Add To Cart */}
           <button
-            onClick={() => addToCart(Product)}
+            onClick={handleAddToCart}
             className="
               bg-yellow-500
               hover:bg-yellow-400

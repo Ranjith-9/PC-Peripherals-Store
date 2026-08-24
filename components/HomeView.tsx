@@ -4,8 +4,8 @@
 import ProductGrid from "@/components/ProductGrid";
 import SideBar from "@/components/SideBar";
 import SortBar from "./SortBar";
-import CategoryBar from "@/components/CategoryBar";
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 //Types
 import type { Product } from "@prisma/client";
 

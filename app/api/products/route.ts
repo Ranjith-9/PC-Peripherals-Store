@@ -39,5 +39,5 @@ export async function GET(req: NextRequest) {
     cursor,
   );
 
-  return NextResponse.json({ products, hasMore: products.length === 5 });
+  return NextResponse.json({ products, hasMore: products.length === 20 });
 }

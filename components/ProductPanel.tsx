@@ -4,12 +4,15 @@ import { Product } from "@prisma/client";
 import { useState } from "react";
 import Link from "next/link";
 import AddProductForm from "./AddProductForm";
+import { useStoreActions } from "@/providers/StoreProvider";
+import Image from "next/image";
 
 interface ProductPanelProps {
   productData: Product;
   isAdmin: boolean;
   onUpdate?: any;
   onDelete?: any;
+  index: any;
 }
 
 export default function ProductPanel({
@@ -17,11 +20,12 @@ export default function ProductPanel({
   isAdmin,
   onUpdate,
   onDelete,
+  index,
 }: ProductPanelProps) {
-  const { addToCart, deleteProduct } = useStore();
+  const { addToCart, deleteProduct } = useStoreActions();
 
   const [flag, setFlag] = useState(false);
-  console.log("ProductPanel rendered ");
+
   return (
     <div className="">
       {flag && (
@@ -50,11 +54,15 @@ export default function ProductPanel({
       >
         <Link href={`/shop/product/${productData.slug}`} prefetch={false}>
           {/* Image */}
-          <div className="h-[260px] overflow-hidden">
-            <img
+          <div className="relative h-[260px] overflow-hidden">
+            <Image
               src={productData.imageUrl}
               alt={productData.name}
-              className="w-full h-full object-cover object-center"
+              fill
+              sizes="(max-width: 640px) 100vw,
+         (max-width: 1024px) 50vw,
+         25vw"
+              className="object-cover object-center"
             />
           </div>
         </Link>

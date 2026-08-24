@@ -39,7 +39,10 @@ export default function AdminPageSelect() {
         </button>
 
         <button
-          onClick={() => setActivePage("orders")}
+          onClick={() => {
+            setActivePage("orders");
+            router.push("/admin/orderupdates");
+          }}
           className={`mt-2 w-full rounded p-3 text-left ${
             activePage === "orders"
               ? "bg-blue-600 text-white"
