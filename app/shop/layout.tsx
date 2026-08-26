@@ -24,7 +24,7 @@ export default async function RootLayout({
     <>
       <NavBar session={session} />
       <CartView />
-      <div className="flex py-1 bg-slate-300">
+      <div className="flex border-b border-t border-[#555555]">
         <CategoryBar mainCategory={mainCategory} />
       </div>
       {children}

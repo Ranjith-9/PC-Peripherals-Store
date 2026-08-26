@@ -6,8 +6,15 @@ import {
   linkPFV,
   checkFilterValue,
 } from "@/services/filter";
+import { requireAdmin } from "@/lib/admin";
 
 export async function POST(req: NextRequest) {
+  const session = await requireAdmin();
+
+  if (!session?.user.id) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
+  }
+
   try {
     const { key, value, subCatId, productId } = await req.json();
 

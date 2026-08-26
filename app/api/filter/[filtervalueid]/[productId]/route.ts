@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { unlinkPFV } from "@/services/filter";
+import { requireAdmin } from "@/lib/admin";
 interface RouteProps {
   params: Promise<{
     filtervalueid: string;
@@ -7,8 +8,14 @@ interface RouteProps {
   }>;
 }
 
-export async function DELETE({ params }: RouteProps) {
+export async function DELETE(request: NextRequest, { params }: RouteProps) {
   try {
+    const session = await requireAdmin();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
+    }
+
     const { filtervalueid, productId } = await params;
     console.log("filter value", filtervalueid);
     console.log("productid", productId);

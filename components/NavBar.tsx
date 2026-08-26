@@ -19,11 +19,18 @@ export default function NavBar({ session, isAdmin = false }: NavBarProps) {
   const { cartOpen, setCartOpen, cartItems, searchBarOpen } = useStore();
 
   return (
-    <nav className="bg-neutral-900 p-4">
+    <nav className="bg-[#171717] p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left */}
         <Link href="/shop/mouse">
-          <div>Gaming Store XYZ</div>
+          <div className="items-baseline">
+            <span className="text-xl font-bold tracking-tight">
+              GAMING STORE{" "}
+              <span className="text-orange-300 text-[12px] font-bold">
+                XYZ.LAB
+              </span>{" "}
+            </span>
+          </div>
         </Link>
         {/* Middle */}
         {searchBarOpen && <SearchBar />}
@@ -41,13 +48,19 @@ export default function NavBar({ session, isAdmin = false }: NavBarProps) {
           <LoginButton session={session} />
           {!isAdmin && (
             <>
-              {session && <Logs onClick={() => router.push("/orders/users")} />}
-              <ShoppingCart
-                className="text-white cursor-pointer"
-                size={35}
+              {session && (
+                <Logs
+                  className="cursor-pointer"
+                  onClick={() => router.push("/orders/users")}
+                />
+              )}
+              <div
+                className="flex items-center gap-1 border border-white rounded px-2 py-1 cursor-pointer"
                 onClick={() => setCartOpen(!cartOpen)}
-              />
-              <span>{cartItems.length}</span>
+              >
+                <ShoppingCart className="text-white  w-6 h-6" />
+                <span>{cartItems.length}</span>
+              </div>
             </>
           )}
         </div>

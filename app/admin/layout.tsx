@@ -23,10 +23,10 @@ export default async function RootLayout({
         <NavBar session={session} isAdmin={true} />
       </div>
       <div className="A2 flex">
-        <div className="B1 h-min-screen">
+        <div className="B1 h-min-screen bg-[#FAFAF7] border-r">
           <AdminPageSelect />
         </div>
-        <div className="B2 flex-1 p-10 bg-gray-100">{children}</div>
+        <div className="B2 flex-1 bg-[#FAFAF7]">{children}</div>
       </div>
     </>
   );

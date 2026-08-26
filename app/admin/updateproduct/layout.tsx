@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth/next";
-import type { Session } from "@/types/user";
 import CategoryBar from "@/components/CategoryBar";
 import { getMainSubCategory } from "@/services/category";
 
@@ -14,11 +12,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session: Session | null = await getServerSession(); // Fetch session data on the server side
   const mainCategory = await getMainSubCategory();
   return (
     <>
-      <div className="flex py-1 bg-slate-300">
+      <div className="flex py">
         <CategoryBar mainCategory={mainCategory} isAdmin={true} />
       </div>
       {children}

@@ -29,16 +29,13 @@ export default function Home({
 
   return (
     <div className="">
-      {/* <div className="flex py-1 bg-slate-300">
-        <CategoryBar mainCategory={mainCategory} />
-      </div> */}
-      <div className="min-h-screen flex bg-gray-100">
+      <div className="min-h-screen flex bg-[#FAFAF7]">
         {/*Side bar*/}
         <div
           className={`relative bg-white transition-all duration-300 ${sidebarOpen ? "w-70" : "w-0"}`}
         >
           <div
-            className={`w-70 h-full transition-transform duration-300 bg-neutral-200  ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+            className={`w-70 h-full transition-transform duration-300 bg-[#FAFAF7]  ${sidebarOpen ? "translate-x-0 border-r" : "-translate-x-full"}`}
           >
             <SideBar categoryFilters={categoryFilters} />
           </div>
@@ -51,9 +48,9 @@ export default function Home({
           </button>
         </div>
         {/*Main content*/}
-        <div className="flex-1 bg-gray-500">
+        <div className="flex-1 bg-[#FAFAF7]">
           {/* Sort bar */}
-          <div className="h-7 bg-white mt-2 mx-4 flex items-center justify-end">
+          <div className="h-7 mt-2 mx-4 flex items-center justify-end">
             <SortBar />
           </div>
           {/* Product grid */}

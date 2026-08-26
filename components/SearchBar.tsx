@@ -22,15 +22,15 @@ export default function SearchBar() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all duration-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
-        <Search className="mr-2 h-5 w-5 text-gray-400" />
+      <div className=" h-9 flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 shadow-sm transition-all duration-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
+        <Search className="mr-2 h-4 w-4 text-gray-400" />
 
         <input
           type="text"
-          placeholder="Search for products..."
+          placeholder="search category products..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full bg-transparent outline-none placeholder:text-gray-400"
+          className="w-full bg-transparent outline-none placeholder:text-gray-400 font-mono "
         />
       </div>
     </div>

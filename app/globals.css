@@ -11,6 +11,10 @@
     --foreground: #ededed;
   }
 }
+@theme {
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+}
 
 body {
   background: var(--background);

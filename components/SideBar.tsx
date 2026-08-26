@@ -81,7 +81,7 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
   };
 
   return (
-    <aside className="w-full text-black p-4 ">
+    <aside className="w-full text-black font-mono uppercase p-4 ">
       {categoryFilters &&
         categoryFilters.map((section) => {
           const isOpen = openSection[section.name] ?? false;
@@ -95,7 +95,7 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
                 {/* Filter name + selected count */}
 
                 <div className="flex items-center gap-2">
-                  <span className="font-bold capitalize">{section.name}</span>
+                  <span className="font-bold text-[13px]">{section.name}</span>
 
                   {count > 0 && (
                     <span className="text-xs text-black">({count})</span>
@@ -123,8 +123,8 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
                     <ChevronDown
                       size={18}
                       className={`
-                      transition-transform duration-300
-                      ${isOpen ? "rotate-180" : ""}
+                      transition-transform duration-300 easein
+                      ${isOpen ? "rotate-180 bg-orange-300" : ""}
                     `}
                     />
                   </button>
@@ -151,7 +151,7 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
                       return (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-center gap-2 text-sm"
+                          className="flex cursor-pointer items-center gap-2 text-xs"
                         >
                           <input
                             type="checkbox"
@@ -160,7 +160,7 @@ export default function SideBar({ categoryFilters }: SideBarProps) {
                             className="h-4 w-4 cursor-pointer"
                           />
 
-                          <span>{value}</span>
+                          <span className="text-xs">{value}</span>
                         </label>
                       );
                     })}

@@ -9,7 +9,7 @@ export default function AdminPageSelect() {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-gray-100 p-4 text-black">
+      <aside className="w-64 p-4 text-black">
         <button
           onClick={() => {
             setActivePage("add");

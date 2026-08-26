@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { addProducts } from "@/services/product";
 import { rateLimiters } from "@/lib/rateLimiter";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin";
 
 export async function POST(req: NextRequest) {
   // 1. Authentication
-  const session = await getServerSession(authOptions);
+  const session = await requireAdmin();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Admin Access Required" },
+      { status: 403 },
+    );
   }
 
   // 2. Rate limiting

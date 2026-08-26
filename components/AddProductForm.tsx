@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import slugify from "slugify";
 import { createId } from "@paralleldrive/cuid2";
 import { Product } from "@prisma/client";
-import { getProductAndFiltersByIds } from "@/services/product";
 import { Check, X } from "lucide-react";
+import type { DetailedProduct } from "@/types/product";
 
 interface ProductFormProps {
   isEdit?: boolean;
@@ -29,7 +29,8 @@ export default function AddProductForm({
     { key: "", value: "", id: "" },
   ]);
 
-  const [detailedProduct, setDetailedProduct] = useState();
+  const [detailedProduct, setDetailedProduct] =
+    useState<DetailedProduct | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -50,8 +51,9 @@ export default function AddProductForm({
     const response = await fetch(`/api/detailedproduct/${productId}`);
     const product = await response.json();
 
-    console.log("product from backend", product);
-
+    if (!product) {
+      return;
+    }
     setForm({
       name: product.name,
       description: product.description,
@@ -69,11 +71,13 @@ export default function AddProductForm({
 
     setDetailedProduct(product);
     setExistingFilters(
-      Object.entries(product.filters ?? {}).map(([key, [value, filterId]]) => ({
-        key,
-        value: String(value),
-        id: filterId,
-      })),
+      Object.entries(product.filters ?? {}).map(
+        ([key, [value, filterId]]: any) => ({
+          key,
+          value: String(value),
+          id: filterId,
+        }),
+      ),
     );
   }
 
@@ -111,7 +115,6 @@ export default function AddProductForm({
       })}-${id}`,
     };
 
-    console.log("type of ", JSON.stringify(updatedForm, null, 2));
     const response = await fetch("/api/product/add", {
       method: "POST",
       headers: {
@@ -120,10 +123,13 @@ export default function AddProductForm({
       body: JSON.stringify(updatedForm),
     });
 
-    const result = response.json();
+    if (response.status === 403) {
+      alert("Admin Access Required");
+      return;
+    }
 
     if (!response.ok) {
-      console.error(result);
+      alert("Something went wrong");
       return;
     }
 
@@ -156,8 +162,12 @@ export default function AddProductForm({
 
     const result = await response.json();
 
+    if (response.status === 403) {
+      alert("Admin Access Required");
+      return;
+    }
     if (!response.ok) {
-      console.error(result);
+      alert("something went wrong");
       return;
     }
     onUpdate(result);
@@ -174,6 +184,9 @@ export default function AddProductForm({
     if (!detailedProduct) {
       return;
     }
+    if (!productDetails) {
+      return;
+    }
     const response = await fetch("/api/filter/addFilter", {
       method: "POST",
       headers: {
@@ -188,14 +201,16 @@ export default function AddProductForm({
     });
 
     const data = await response.json();
-
+    if (response.status === 403) {
+      alert("Admin Access Required");
+      return;
+    }
     if (!response.ok) {
-      console.log(data.message);
+      alert("Something went wrong");
       return;
     }
 
     getFullProductDetails(productDetails.id);
-    console.log("success:", data.message);
   };
 
   const deleteFilter = async (filterId: string, productId: string) => {
@@ -205,12 +220,18 @@ export default function AddProductForm({
 
     const result = await response.json();
 
-    if (!response.ok) {
-      console.error(result);
+    if (response.status === 403) {
+      alert("Admin Access Required");
+      return;
     }
-
+    if (!response.ok) {
+      alert("Something went wrong");
+      return;
+    }
+    if (!productDetails) {
+      return;
+    }
     getFullProductDetails(productDetails.id);
-    console.log("success:", result.message);
   };
 
   return (
@@ -405,7 +426,10 @@ export default function AddProductForm({
                   </button>
                 ) : (
                   <button
-                    onClick={() => deleteFilter(filter.id, detailedProduct.id)}
+                    onClick={() => {
+                      if (!detailedProduct) return;
+                      deleteFilter(filter.id, detailedProduct.id);
+                    }}
                   >
                     {" "}
                     <X />

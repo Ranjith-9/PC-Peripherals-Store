@@ -171,42 +171,32 @@ export async function getProductAndFiltersByIds(id: string) {
 }
 
 export async function getFilters(category: string) {
-  console.time("filterCategories query");
-  console.time("filterValues query");
   const [filterCategories, filterValues] = await Promise.all([
-    db.filterCategory
-      .findMany({
-        where: {
+    db.filterCategory.findMany({
+      where: {
+        subCategory: {
+          slug: category,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    }),
+
+    db.filterValue.findMany({
+      where: {
+        filterCategory: {
           subCategory: {
             slug: category,
           },
         },
-        select: {
-          id: true,
-          name: true,
-        },
-      })
-      .finally(() => {
-        console.timeEnd("filterCategories query");
-      }),
-
-    db.filterValue
-      .findMany({
-        where: {
-          filterCategory: {
-            subCategory: {
-              slug: category,
-            },
-          },
-        },
-        select: {
-          value: true,
-          filterCategoryId: true,
-        },
-      })
-      .finally(() => {
-        console.timeEnd("filterValues query");
-      }),
+      },
+      select: {
+        value: true,
+        filterCategoryId: true,
+      },
+    }),
   ]);
 
   return filterCategories.map((filterCategory: any) => ({

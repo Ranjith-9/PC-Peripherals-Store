@@ -19,3 +19,17 @@ export interface Product {
   slug: string | null;
   isActive: boolean | null;
 }
+
+export interface DetailedProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  stock: number;
+  subcategoryId: string;
+
+  attributes: Record<string, string>;
+
+  filters: Record<string, [string, string]>;
+}
