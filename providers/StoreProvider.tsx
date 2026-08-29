@@ -354,7 +354,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     await res.json();
 
-    alert("Product deleted successfully");
+    if (res.status === 200) {
+      alert("Product deleted successfully");
+    }
+    if (res.status === 401) {
+      alert("user unauthorized");
+    }
   }, []);
 
   /* =======================================================
