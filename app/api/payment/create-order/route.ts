@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { razorpay } from "@/lib/razorpay";
+import { getRazorpay } from "@/lib/razorpay";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { checkProducts } from "@/services/product";
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     currency: "INR",
     receipt: "receipt_" + Date.now(),
   };
-
+  const razorpay = getRazorpay();
   const order = await razorpay.orders.create(options);
 
   return NextResponse.json(order);
